@@ -223,13 +223,17 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
 .score svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
 .score .clickable-note { cursor: pointer; }
 
-/* degree chip (inline in prose) */
+/* degree chip (inline in prose): the number stays on the text baseline,
+   the caret floats above it without affecting the line box */
 .deg {
-  display: inline-flex; flex-direction: column; align-items: center;
-  line-height: 1; vertical-align: -0.15em; margin: 0 0.06em;
+  display: inline-block; position: relative; margin: 0 0.08em;
   font-variant-numeric: tabular-nums; font-weight: 700;
 }
-.deg .caret { font-size: 0.55em; line-height: 0.6; transform: translateY(0.14em); }
+.deg .caret {
+  position: absolute; top: -0.62em; inset-inline-start: 50%;
+  transform: translateX(50%); font-size: 0.55em; line-height: 1;
+}
+[dir="ltr"] .deg .caret { transform: translateX(-50%); }
 .deg.stable-c { color: var(--stable); }
 .deg.active-c { color: var(--accent); }
 

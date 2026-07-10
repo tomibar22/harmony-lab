@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Accidental, Dot, Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
+import { Accidental, Barline, Beam, Dot, Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
 import { playNote } from "../engine/audio";
 
 export type ScoreNote = {
@@ -8,6 +8,7 @@ export type ScoreNote = {
   dots?: number;
   midi: number[];            // for click-playback + sequencing
   kind?: "stable" | "active" | "plain";
+  beam?: string;             // notes sharing a beam id get beamed together
   degree?: string;           // scale-degree number drawn with a caret above
   mark?: string;             // plain marking above (P, N, ½ …)
   sub?: string;              // Hebrew label below
@@ -78,6 +79,9 @@ export function Score({
     const stave = new Stave(4, 32, w - 10);
     stave.addClef(clef);
     if (keySig) stave.addKeySignature(keySig);
+    // these staves are diagrams, not measures — no enclosing barlines
+    stave.setBegBarType(Barline.type.NONE);
+    stave.setEndBarType(Barline.type.NONE);
     stave.setContext(context).draw();
 
     if (notes.length === 0) {
@@ -101,8 +105,30 @@ export function Score({
     voice.setMode(Voice.Mode.SOFT);
     voice.addTickables(vexNotes);
     Accidental.applyAccidentals([voice], accidentalKey ?? keySig ?? "C");
+
+    const beams: Beam[] = [];
+    let group: StaveNote[] = [];
+    let groupId: string | undefined;
+    const flushBeam = () => {
+      if (group.length > 1) beams.push(new Beam(group));
+      group = [];
+      groupId = undefined;
+    };
+    notes.forEach((n, i) => {
+      if (n.beam && n.beam === groupId) group.push(vexNotes[i]);
+      else {
+        flushBeam();
+        if (n.beam) {
+          groupId = n.beam;
+          group = [vexNotes[i]];
+        }
+      }
+    });
+    flushBeam();
+
     new Formatter().joinVoices([voice]).format([voice], w - 90);
     voice.draw(context, stave);
+    beams.forEach((b) => b.setContext(context).draw());
 
     const svg = host.querySelector("svg")!;
     svg.setAttribute("role", "img");

@@ -24,9 +24,9 @@ export function CircleOfFifths() {
   const [selected, setSelected] = useState<MajorKey>(MAJOR_KEYS[0]);
   const player = useSequencePlayer();
 
-  const R = 150;
-  const cx = 170;
-  const cy = 170;
+  const R = 148;
+  const cx = 186;
+  const cy = 186;
 
   const playScale = () => {
     const scale = buildScale(selected.tonicMidi, SCALE_PATTERNS.major);
@@ -38,7 +38,7 @@ export function CircleOfFifths() {
 
   return (
     <div className="cof">
-      <svg viewBox="0 0 340 340" aria-label="מעגל הקווינטות">
+      <svg viewBox="0 0 372 372" aria-label="מעגל הקווינטות">
         <circle cx={cx} cy={cy} r={R} fill="none" stroke="var(--line)" strokeWidth={1.5} />
         <circle cx={cx} cy={cy} r={R - 52} fill="none" stroke="var(--line)" strokeDasharray="3 5" strokeWidth={1} />
         {POSITIONS.map((pos, i) => {
@@ -97,12 +97,12 @@ export function CircleOfFifths() {
         <div className="row">
           מינור מקביל (רלטיבי): <b>{selected.relativeMinor} מינור</b>
         </div>
-        <div style={{ margin: "0.6rem 0" }}>
+        <div style={{ margin: "0.6rem 0", direction: "ltr" }}>
           <Score
             key={selected.vex}
             notes={[]}
             keySig={selected.vex}
-            width={190}
+            width={216}
             ariaLabel={`סימן ההיתק של ${selected.name} מז'ור`}
           />
         </div>

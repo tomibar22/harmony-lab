@@ -23,8 +23,8 @@ const MOZART_MELODY: ScoreNote[] = [
   { keys: ["e/5"], duration: "q", midi: [76] },
   { keys: ["g/5"], duration: "q", midi: [79] },
   { keys: ["b/4"], duration: "q", dots: 1, midi: [71] },
-  { keys: ["c/5"], duration: "16", midi: [72] },
-  { keys: ["d/5"], duration: "16", midi: [74] },
+  { keys: ["c/5"], duration: "16", midi: [72], beam: "m2" },
+  { keys: ["d/5"], duration: "16", midi: [74], beam: "m2" },
   { keys: ["c/5"], duration: "h", midi: [72] },
 ];
 const MOZART_SEQ: SeqEvent[] = [
@@ -35,9 +35,10 @@ const MOZART_SEQ: SeqEvent[] = [
   { midi: 72, time: 5.5, dur: 0.25, idx: 4 },
   { midi: 74, time: 5.75, dur: 0.25, idx: 5 },
   { midi: 72, time: 6, dur: 2, idx: 6 },
-  // Alberti figuration: C major then G7 colour
+  // Alberti figuration: bar 1 tonic; bar 2 dominant seventh resolving back to tonic
   ...[60, 67, 64, 67, 60, 67, 64, 67].map((m, i) => ({ midi: m, time: i * 0.5, dur: 0.5, vel: 0.45 })),
-  ...[62, 67, 65, 67, 62, 67, 65, 67].map((m, i) => ({ midi: m, time: 4 + i * 0.5, dur: 0.5, vel: 0.45 })),
+  ...[62, 67, 65, 67].map((m, i) => ({ midi: m, time: 4 + i * 0.5, dur: 0.5, vel: 0.45 })),
+  ...[60, 67, 64, 67].map((m, i) => ({ midi: m, time: 6 + i * 0.5, dur: 0.5, vel: 0.45 })),
 ];
 
 const SKELETON: ScoreNote[] = [
