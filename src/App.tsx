@@ -27,12 +27,14 @@ function Toc() {
   const [active, setActive] = useState("");
   useEffect(() => {
     let io: IntersectionObserver | null = null;
-    let timer: ReturnType<typeof setInterval> | null = null;
-    let tries = 0;
+    let sig = "";
     const scan = () => {
       const sections = Array.from(document.querySelectorAll<HTMLElement>("section.lesson-section"));
-      if (!sections.length) return false;
+      const nextSig = sections.map((s) => s.id).join(",");
+      if (nextSig === sig) return;
+      sig = nextSig;
       setItems(sections.map((s) => ({ id: s.id, title: s.dataset.toc ?? s.id })));
+      io?.disconnect();
       io = new IntersectionObserver(
         (entries) => {
           for (const e of entries) if (e.isIntersecting) setActive(e.target.id);
@@ -40,19 +42,14 @@ function Toc() {
         { rootMargin: "-20% 0px -70% 0px" }
       );
       sections.forEach((s) => io!.observe(s));
-      return true;
     };
-    // the unit component is lazy-loaded — retry until its sections appear
-    if (!scan()) {
-      timer = setInterval(() => {
-        if (scan() || ++tries > 40) {
-          clearInterval(timer!);
-          timer = null;
-        }
-      }, 250);
-    }
+    scan();
+    // the unit is lazy-loaded, and hash navigation can swap units under us —
+    // rescan whenever the lesson DOM actually changes (signature-guarded)
+    const mo = new MutationObserver(scan);
+    mo.observe(document.body, { childList: true, subtree: true });
     return () => {
-      if (timer) clearInterval(timer);
+      mo.disconnect();
       io?.disconnect();
     };
   }, []);

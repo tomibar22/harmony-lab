@@ -1,11 +1,19 @@
 import { ReactNode, useMemo, useState } from "react";
 
+/** Options are plain strings, or value/label pairs when the label needs markup
+ *  (e.g. stacked figured-bass numbers). Answers always compare by value. */
+export type Option = string | { value: string; label: ReactNode };
+
 export type Question = {
   prompt: ReactNode;
-  options: string[];
+  options: Option[];
   answer: string;
+  answerLabel?: ReactNode;   // shown in feedback instead of the raw answer value
   explain?: ReactNode;
 };
+
+const valueOf = (o: Option) => (typeof o === "string" ? o : o.value);
+const labelOf = (o: Option) => (typeof o === "string" ? o : o.label);
 
 type Props = {
   title: string;
@@ -54,14 +62,15 @@ export function Drill({ title, generate }: Props) {
       <div className="d-prompt">{q.prompt}</div>
       <div className="d-options">
         {q.options.map((opt) => {
+          const val = valueOf(opt);
           let cls = "d-opt";
           if (chosen) {
-            if (opt === q.answer) cls += " correct";
-            else if (opt === chosen) cls += " wrong";
+            if (val === q.answer) cls += " correct";
+            else if (val === chosen) cls += " wrong";
           }
           return (
-            <button key={opt} className={cls} disabled={!!chosen} onClick={() => answer(opt)}>
-              {opt}
+            <button key={val} className={cls} disabled={!!chosen} onClick={() => answer(val)}>
+              {labelOf(opt)}
             </button>
           );
         })}
@@ -72,7 +81,7 @@ export function Drill({ title, generate }: Props) {
             <span style={{ color: "var(--stable)", fontWeight: 700 }}>נכון! {q.explain}</span>
           ) : (
             <span>
-              <span style={{ color: "var(--accent)", fontWeight: 700 }}>התשובה: {q.answer}. </span>
+              <span style={{ color: "var(--accent)", fontWeight: 700 }}>התשובה: {q.answerLabel ?? q.answer}. </span>
               {q.explain}
             </span>
           ))}
