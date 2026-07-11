@@ -115,7 +115,15 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit10/Unit10").then((m) => ({ default: m.Unit10 }))),
   },
-  { id: "11", num: 11, part: 2, title: "הקוורט־סקסט הקדנציאלי", blurb: "6/4 שמעטר את הדומיננטה בקדנצה.", ready: false },
+  {
+    id: "11",
+    num: 11,
+    part: 2,
+    title: "הקוורט־סקסט הקדנציאלי",
+    blurb: "צלילי הטוניקה על בס הדומיננטה: ‏6/4 שנמס אל 5/3 — העיכוב הדרמטי שלפני הקדנצה.",
+    ready: true,
+    component: lazy(() => import("./unit11/Unit11").then((m) => ({ default: m.Unit11 }))),
+  },
   { id: "12", num: 12, part: 2, title: "VI ו־IV6", blurb: "הקדנצה הנמנעת והרחבות הטוניקה.", ready: false },
   { id: "13", num: 13, part: 2, title: "ספטאקורדים של II ו־IV", blurb: "העשרת הדרך אל הדומיננטה.", ready: false },
 ];
