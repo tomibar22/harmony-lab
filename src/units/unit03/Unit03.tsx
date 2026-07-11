@@ -54,10 +54,10 @@ const VALUE_LADDER_SEQ: SeqEvent[] = [
 ];
 
 const DOTTED_NOTES: ScoreNote[] = [
-  { keys: ["g/4"], duration: "q", dots: 1, midi: [67], sub: "רבע מנוקד = רבע + שמינית" },
-  { keys: ["g/4"], duration: "8", midi: [67] },
-  { keys: ["g/4"], duration: "h", dots: 1, midi: [67], sub: "חצי מנוקד = חצי + רבע" },
-  { keys: ["g/4"], duration: "q", midi: [67] },
+  { keys: ["g/4"], duration: "q", dots: 1, midi: [67], sub: "רבע מנוקד" },
+  { keys: ["g/4"], duration: "8", midi: [67], sub: "+ שמינית" },
+  { keys: ["g/4"], duration: "h", dots: 1, midi: [67], sub: "חצי מנוקד" },
+  { keys: ["g/4"], duration: "q", midi: [67], sub: "+ רבע" },
 ];
 
 /* ---------------- meters ---------------- */
@@ -381,7 +381,7 @@ export function Unit03() {
           title="סולם הערכים — כל תו מתחלק לשניים (מעל דופק קבוע)"
           foot={<PlayButton label="נגנו את הסולם, מהשלם לשש־עשרית" events={VALUE_LADDER_SEQ} bpm={112} player={valuePlayer} />}
         >
-          <Score notes={NOTE_VALUES} highlightIndex={valuePlayer.index} ariaLabel="תו שלם, חצי, רבע, שמינית ושש־עשרית" />
+          <Score notes={NOTE_VALUES} even width={620} highlightIndex={valuePlayer.index} ariaLabel="תו שלם, חצי, רבע, שמינית ושש־עשרית" />
         </Widget>
         <p>
           שני כלים מרחיבים את המערכת: <b>נקודה</b> אחרי תו מוסיפה לו חצי מערכו (רבע מנוקד = רבע + שמינית),
@@ -396,7 +396,7 @@ export function Unit03() {
             { midi: 67, time: 6, dur: 1, idx: 3 },
           ]} bpm={100} player={dotPlayer} />}
         >
-          <Score notes={DOTTED_NOTES} highlightIndex={dotPlayer.index} ariaLabel="רבע מנוקד עם שמינית וחצי מנוקד עם רבע" />
+          <Score notes={DOTTED_NOTES} even width={480} highlightIndex={dotPlayer.index} ariaLabel="רבע מנוקד עם שמינית וחצי מנוקד עם רבע" />
         </Widget>
       </Section>
 

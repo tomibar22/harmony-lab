@@ -20,6 +20,7 @@ type Props = {
   clef?: "treble" | "bass";
   keySig?: string;           // VexFlow key signature, e.g. "F", "Bb", "Am"
   timeSig?: string;          // VexFlow time signature, e.g. "3/4", "6/8"
+  even?: boolean;            // space notes uniformly instead of by duration (for value charts)
   accidentalKey?: string;    // key context for automatic accidentals (default keySig or "C")
   width?: number;
   clickable?: boolean;
@@ -55,6 +56,7 @@ export function Score({
   clef = "treble",
   keySig,
   timeSig,
+  even = false,
   accidentalKey,
   width,
   clickable = true,
@@ -131,7 +133,7 @@ export function Score({
     });
     flushBeam();
 
-    new Formatter().joinVoices([voice]).format([voice], w - 90);
+    new Formatter(even ? { softmaxFactor: 1 } : undefined).joinVoices([voice]).format([voice], w - 90);
     voice.draw(context, stave);
     beams.forEach((b) => b.setContext(context).draw());
 
@@ -227,7 +229,7 @@ export function Score({
         svg.appendChild(t);
       }
     });
-  }, [notes, clef, keySig, timeSig, accidentalKey, width, clickable, ariaLabel, themeVersion]);
+  }, [notes, clef, keySig, timeSig, even, accidentalKey, width, clickable, ariaLabel, themeVersion]);
 
   // playback highlight (group-level fill/stroke override, restoring the kind colour)
   useEffect(() => {
