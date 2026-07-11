@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { UNITS } from "../units/registry";
+import { FigText } from "./ui";
 
 /** End-of-lesson teaser with a link to the next unit (when it exists). */
 export function NextUnit({ current, children }: { current: number; children: ReactNode }) {
@@ -9,7 +10,7 @@ export function NextUnit({ current, children }: { current: number; children: Rea
       <p style={{ margin: 0 }}>{children}</p>
       {next?.ready && (
         <a className="next-link" href={`#/unit/${next.id}`}>
-          המשיכו ליחידה {next.num}: {next.title} ←
+          המשיכו ליחידה {next.num}: <FigText text={next.title} /> ←
         </a>
       )}
     </div>

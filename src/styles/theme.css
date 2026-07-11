@@ -243,13 +243,18 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
 .deg.stable-c { color: var(--stable); }
 .deg.active-c { color: var(--accent); }
 
-/* figured-bass stack (inline in prose): digits one above the other */
+/* figured-bass stack (inline in prose): digits one above the other,
+   centered on the text line so the stack doesn't sag below the baseline */
 .fig {
   display: inline-flex; flex-direction: column; align-items: center;
   line-height: 1.02; font-size: 0.68em; font-weight: 700;
-  vertical-align: 0.05em; margin: 0 0.18em;
+  vertical-align: middle; transform: translateY(-0.08em); margin: 0 0.18em;
   font-variant-numeric: tabular-nums;
 }
+
+/* roman numeral + stacked figure (e.g. V with 6 over 5) */
+.rn { white-space: nowrap; unicode-bidi: isolate; }
+.rn .fig { margin: 0 0.06em; }
 
 /* term / glossary */
 .term {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
-import { Callout, Deg, Fig, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
+import { Callout, Deg, Fig, FigText, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
 import { NextUnit } from "../../components/NextUnit";
 import { Satb, SatbScores, chordSeq } from "../../components/Satb";
 
@@ -341,8 +341,8 @@ export function Unit08() {
       </Section>
 
       <NextUnit current={8}>
-        <b>הבא בתור — יחידה 9: היפוכי V7.</b> מה שעשינו למשולשים נעשה עכשיו לספטאקורד: 6/5, ‏4/3 ו־4/2
-        שמים כל אחד מצלילי הדומיננטה בבס — וכל אחד מביא צבע ותפקיד משלו.
+        <b>הבא בתור — יחידה 9: היפוכי V7.</b>{" "}
+        <FigText text="מה שעשינו למשולשים נעשה עכשיו לספטאקורד: ‏6/5, ‏4/3 ו־4/2 שמים כל אחד מצלילי הדומיננטה בבס — וכל אחד מביא צבע ותפקיד משלו." />
       </NextUnit>
     </div>
   );

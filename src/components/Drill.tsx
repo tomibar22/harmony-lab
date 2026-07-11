@@ -1,4 +1,5 @@
 import { ReactNode, useMemo, useState } from "react";
+import { FigText } from "./ui";
 
 /** Options are plain strings, or value/label pairs when the label needs markup
  *  (e.g. stacked figured-bass numbers). Answers always compare by value. */
@@ -13,7 +14,8 @@ export type Question = {
 };
 
 const valueOf = (o: Option) => (typeof o === "string" ? o : o.value);
-const labelOf = (o: Option) => (typeof o === "string" ? o : o.label);
+// plain-string options pass through FigText so inversion figures render stacked
+const labelOf = (o: Option) => (typeof o === "string" ? <FigText text={o} /> : o.label);
 
 type Props = {
   title: string;
@@ -81,7 +83,7 @@ export function Drill({ title, generate }: Props) {
             <span style={{ color: "var(--stable)", fontWeight: 700 }}>נכון! {q.explain}</span>
           ) : (
             <span>
-              <span style={{ color: "var(--accent)", fontWeight: 700 }}>התשובה: {q.answerLabel ?? q.answer}. </span>
+              <span style={{ color: "var(--accent)", fontWeight: 700 }}>התשובה: {q.answerLabel ?? <FigText text={q.answer} />}. </span>
               {q.explain}
             </span>
           ))}
