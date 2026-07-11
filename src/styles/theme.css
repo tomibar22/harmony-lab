@@ -323,4 +323,10 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
   margin-top: 4rem; padding: 1.5rem; text-align: center;
   border: 1px dashed var(--line); border-radius: var(--radius); color: var(--ink-soft);
 }
+.next-unit .next-link {
+  display: inline-block; margin-top: 1rem; padding: 0.55rem 1.3rem;
+  background: var(--ink); color: var(--bg); border-radius: 999px;
+  font-weight: 700; text-decoration: none; transition: transform .15s, opacity .15s;
+}
+.next-unit .next-link:hover { transform: translateY(-1px); opacity: 0.9; }
 footer.site { text-align: center; color: var(--ink-soft); font-size: 0.8rem; padding: 2rem 1rem 3rem; border-top: 1px solid var(--line); }

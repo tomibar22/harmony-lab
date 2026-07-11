@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
+import { NextUnit } from "../../components/NextUnit";
 import { SeqEvent } from "../../engine/audio";
 
 /* ---------------- rhythm helpers ---------------- */
@@ -572,10 +573,10 @@ export function Unit03() {
         <Drill title="מונחי הטמפו" generate={tempoQuestion} />
       </Section>
 
-      <div className="next-unit">
+      <NextUnit current={3}>
         <b>הבא בתור — יחידה 4: משולשים וספטאקורדים.</b> מהמרווחים אל האקורדים: איך בונים משולש, מה מבדיל
         מז'ורי ממינורי וממוקטן, ומהם ההיפוכים — אבני הבניין של כל ההרמוניה שנלמד מכאן והלאה.
-      </div>
+      </NextUnit>
     </div>
   );
 }

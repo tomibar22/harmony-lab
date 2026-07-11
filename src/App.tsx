@@ -12,13 +12,17 @@ function useHashRoute(): string {
 }
 
 function useTheme() {
-  const [theme, setTheme] = useState<string>(() => localStorage.getItem("hl-theme") ?? "auto");
+  const [theme, setTheme] = useState<string>(() => {
+    const stored = localStorage.getItem("hl-theme");
+    if (stored === "dark" || stored === "light") return stored;
+    // first visit (or legacy "auto"): start from the system preference
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  });
   useEffect(() => {
-    if (theme === "auto") document.documentElement.removeAttribute("data-theme");
-    else document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("hl-theme", theme);
   }, [theme]);
-  const cycle = () => setTheme((t) => (t === "auto" ? "dark" : t === "dark" ? "light" : "auto"));
+  const cycle = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
   return { theme, cycle };
 }
 
@@ -129,8 +133,13 @@ export default function App() {
           מעבדת הרמוניה<small>Harmony Lab</small>
         </a>
         <span className="spacer" />
-        <button className="icon-btn" onClick={cycle} title={`ערכת נושא: ${theme}`} aria-label="החלפת ערכת נושא">
-          {theme === "dark" ? "🌙" : theme === "light" ? "☀️" : "◐"}
+        <button
+          className="icon-btn"
+          onClick={cycle}
+          title={theme === "dark" ? "מעבר למצב בהיר" : "מעבר למצב כהה"}
+          aria-label="החלפת ערכת נושא"
+        >
+          {theme === "dark" ? "☀️" : "🌙"}
         </button>
       </header>
       {UnitComp ? (
