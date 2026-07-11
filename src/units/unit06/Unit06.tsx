@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, Deg, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
+import { NextUnit } from "../../components/NextUnit";
 import { SeqEvent } from "../../engine/audio";
 
 /* ---------------- SATB layout: two staves rendered as two stacked Scores ---------------- */
@@ -50,10 +51,10 @@ function SatbScores({
 /* ---------------- the voices and their ranges ---------------- */
 
 const VOICES = [
-  { he: "סופרן", en: "Soprano", range: "דו4 – סול5", midi: [60, 79] },
-  { he: "אלט", en: "Alto", range: "סול3 – רה5", midi: [55, 74] },
-  { he: "טנור", en: "Tenor", range: "דו3 – סול4", midi: [48, 67] },
-  { he: "בס", en: "Bass", range: "מי2 – רה4", midi: [40, 62] },
+  { he: "סופרן", en: "Soprano", range: "דו4 – סול5", clef: "treble" as const, low: ["c/4", 60, "דו4"], high: ["g/5", 79, "סול5"] },
+  { he: "אלט", en: "Alto", range: "סול3 – רה5", clef: "treble" as const, low: ["g/3", 55, "סול3"], high: ["d/5", 74, "רה5"] },
+  { he: "טנור", en: "Tenor", range: "דו3 – סול4", clef: "bass" as const, low: ["c/3", 48, "דו3"], high: ["g/4", 67, "סול4"] },
+  { he: "בס", en: "Bass", range: "מי2 – רה4", clef: "bass" as const, low: ["e/2", 40, "מי2"], high: ["d/4", 62, "רה4"] },
 ] as const;
 
 /* ---------------- close vs open position of the same I chord ---------------- */
@@ -63,12 +64,12 @@ const OPEN_CHORD: Satb = { s: ["c/5", 72], a: ["e/4", 64], t: ["g/3", 55], b: ["
 
 const POSITIONS = [
   {
-    he: "שכנוּת (close)",
+    he: "מצב סגור (close)",
     chord: CLOSE_CHORD,
     note: "שלושת הקולות העליונים צפופים ככל האפשר — הסופרן והטנור בתוך אוקטבה אחת. צליל קומפקטי ומלוכד.",
   },
   {
-    he: "פתוחה (open)",
+    he: "מצב פתוח (open)",
     chord: OPEN_CHORD,
     note: "מרווח גדול יותר בין הקולות העליונים — צליל רחב ומאוורר. שימו לב: בין קולות עליונים שכנים עדיין לא יותר מאוקטבה.",
   },
@@ -235,20 +236,32 @@ export function Unit06() {
           <SatbScores chords={[CLOSE_CHORD]} highlight={satbPlayer.index} width={240} label="משולש דו מז'ור" />
         </Widget>
         <p>הטווחים הנוחים של ארבעת הקולות — כדאי להכיר, כי חריגה מהם נשמעת (ומזייפת) מיד:</p>
-        <div className="review-grid">
-          {VOICES.map((v) => (
-            <div key={v.he} className="review-chip">
-              <b>{v.he}</b>
-              {v.range}
-            </div>
-          ))}
-        </div>
+        <Widget title="מנעד ארבעת הקולות — מהצליל הנמוך לגבוה (לחצו לשמיעה)">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.75rem" }}>
+            {VOICES.map((v) => (
+              <div key={v.he} style={{ textAlign: "center" }}>
+                <div style={{ fontWeight: 700, marginBottom: "0.1rem" }}>
+                  {v.he} <span style={{ color: "var(--ink-soft)", fontWeight: 400, fontSize: "0.85rem" }} dir="ltr">({v.en})</span>
+                </div>
+                <Score
+                  notes={[
+                    { keys: [v.low[0]], midi: [v.low[1]], sub: v.low[2] },
+                    { keys: [v.high[0]], midi: [v.high[1]], sub: v.high[2] },
+                  ]}
+                  clef={v.clef}
+                  width={200}
+                  ariaLabel={`מנעד ה${v.he}: ${v.range}`}
+                />
+              </div>
+            ))}
+          </div>
+        </Widget>
       </Section>
 
-      <Section id="spacing" num="6.2" title="שכנוּת, פתוחה, ומרווחי הקולות">
+      <Section id="spacing" num="6.2" title="מצב סגור, מצב פתוח ומרווחי הקולות">
         <p>
-          את אותו אקורד אפשר לפרוס צפוף או מאוורר. בפריסת <b>שכנוּת</b> שלושת העליונים דחוסים יחד; בפריסה
-          <b> פתוחה</b> הם נושמים. כלל הזהב אחד: בין קולות עליונים שכנים (סופרן–אלט, אלט–טנור) —{" "}
+          את אותו אקורד אפשר לפרוס צפוף או מאוורר. ב<b>מצב סגור</b> שלושת העליונים דחוסים יחד; ב<b>מצב
+          פתוח</b> הם נושמים. כלל הזהב אחד: בין קולות עליונים שכנים (סופרן–אלט, אלט–טנור) —{" "}
           <em className="hl">לא יותר מאוקטבה</em>. רק מעל הבס המרווח חופשי, בדיוק כמו שסדרת העליונים
           מיחידה 2 דלילה למטה וצפופה למעלה:
         </p>
@@ -383,10 +396,10 @@ export function Unit06() {
         <Drill title="צלילים מחויבים" generate={tendencyQuestion} />
       </Section>
 
-      <div className="next-unit">
+      <NextUnit current={6}>
         <b>סיימתם את שש יחידות היסוד!</b> מכאן נפתח לב הספר — הפרוגרסיות ההרמוניות, החל ב־I–V–I. יחידות
         נוספות יתווספו בהמשך.
-      </div>
+      </NextUnit>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Keyboard } from "../../components/Keyboard";
 import { CircleOfFifths } from "../../components/CircleOfFifths";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, Deg, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
+import { NextUnit } from "../../components/NextUnit";
 import { SeqEvent } from "../../engine/audio";
 import {
   DEGREE_NAMES_HE,
@@ -493,10 +494,10 @@ export function Unit01() {
         <Drill title="שמות הדרגות" generate={degreeNameQuestion} />
       </Section>
 
-      <div className="next-unit">
+      <NextUnit current={1}>
         <b>הבא בתור — יחידה 2: מרווחים.</b> איך מודדים את המרחק בין שני צלילים, מה זו סדרת העליות,
         ולמה קונסוננס ודיסוננס הם מנוע התנועה של המוזיקה.
-      </div>
+      </NextUnit>
     </div>
   );
 }

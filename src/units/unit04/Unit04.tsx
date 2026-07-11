@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, Deg, Fig, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
+import { NextUnit } from "../../components/NextUnit";
 import { SeqEvent } from "../../engine/audio";
 
 /* ---------------- triad qualities on C ---------------- */
@@ -491,10 +492,10 @@ export function Unit04() {
         <Drill title="ספרורי הספטאקורד" generate={seventhFigureQuestion} />
       </Section>
 
-      <div className="next-unit">
+      <NextUnit current={4}>
         <b>הבא בתור — יחידה 5: מבוא לקונטרפונקט.</b> לפני שנחבר אקורדים בזה אחר זה, נלמד לחבר שני קווים
         מלודיים — קול מול קול, על חמשת המינים הקלאסיים של הקונטרפונקט.
-      </div>
+      </NextUnit>
     </div>
   );
 }

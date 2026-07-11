@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
+import { NextUnit } from "../../components/NextUnit";
 import { SeqEvent } from "../../engine/audio";
 
 /* ---------------- Fux's cantus firmus in D (Gradus ad Parnassum, 1725) ---------------- */
@@ -82,10 +83,10 @@ const SPECIES2_SEQ: SeqEvent[] = [
 ];
 
 const SPECIES3_NOTES: ScoreNote[] = [
-  { keys: ["e/4"], duration: "q", midi: [64], mark: "3", beam: "a" },
-  { keys: ["f/4"], duration: "q", midi: [65], mark: "P", kind: "active", beam: "a" },
-  { keys: ["g/4"], duration: "q", midi: [67], mark: "5", beam: "b" },
-  { keys: ["a/4"], duration: "q", midi: [69], mark: "6", beam: "b" },
+  { keys: ["e/4"], duration: "q", midi: [64], mark: "3" },
+  { keys: ["f/4"], duration: "q", midi: [65], mark: "P", kind: "active" },
+  { keys: ["g/4"], duration: "q", midi: [67], mark: "5" },
+  { keys: ["a/4"], duration: "q", midi: [69], mark: "6" },
   { keys: ["g/4"], duration: "w", midi: [67], mark: "5" },
 ];
 const SPECIES3_SEQ: SeqEvent[] = [
@@ -407,10 +408,10 @@ export function Unit05() {
         <Drill title="שלבי ההשהיה" generate={suspensionQuestion} />
       </Section>
 
-      <div className="next-unit">
+      <NextUnit current={5}>
         <b>הבא בתור — יחידה 6: כתיבה בארבעה קולות.</b> הקונטרפונקט פוגש את האקורדים: מקהלת סופרן–אלט–טנור–בס,
         טווחים ומרווחים, הכפלות, והחוקים שהופכים רצף אקורדים להובלת קולות.
-      </div>
+      </NextUnit>
     </div>
   );
 }
