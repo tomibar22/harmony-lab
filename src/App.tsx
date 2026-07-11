@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useState } from "react";
 import { PARTS, UNITS } from "./units/registry";
+import { FigText } from "./components/ui";
 
 function useHashRoute(): string {
   const [hash, setHash] = useState(window.location.hash);
@@ -70,7 +71,7 @@ function Toc() {
           }}
           className={active === it.id ? "active" : ""}
         >
-          {it.title}
+          <FigText text={it.title} />
         </a>
       ))}
     </nav>
@@ -95,15 +96,15 @@ function Home() {
               u.ready ? (
                 <a key={u.id} className="unit-card ready" href={`#/unit/${u.id}`}>
                   <div className="u-num">{u.num}</div>
-                  <h3>{u.title}</h3>
-                  <p>{u.blurb}</p>
+                  <h3><FigText text={u.title} /></h3>
+                  <p><FigText text={u.blurb} /></p>
                   <span className="badge">מוכן ללמידה</span>
                 </a>
               ) : (
                 <div key={u.id} className="unit-card soon" aria-disabled>
                   <div className="u-num">{u.num}</div>
-                  <h3>{u.title}</h3>
-                  <p>{u.blurb}</p>
+                  <h3><FigText text={u.title} /></h3>
+                  <p><FigText text={u.blurb} /></p>
                   <span className="badge">בקרוב</span>
                 </div>
               )

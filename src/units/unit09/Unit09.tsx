@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
-import { Callout, Deg, Fig, PlayButton, Section, Widget, usePlayer } from "../../components/ui";
+import { Callout, Deg, Fig, FigText, PlayButton, Rn, Section, Widget, usePlayer } from "../../components/ui";
 import { NextUnit } from "../../components/NextUnit";
 import { Satb, SatbScores, chordSeq } from "../../components/Satb";
 
@@ -95,7 +95,7 @@ function bassQuestion(): Question {
   return {
     prompt: (
       <>
-        איזו דרגה יושבת בבס של <span dir="ltr">{q.chord}</span>?
+        איזו דרגה יושבת בבס של <Rn n={q.chord} />?
       </>
     ),
     options: shuffle(["2", "4", "5", "7"]),
@@ -106,7 +106,7 @@ function bassQuestion(): Question {
 
 const RESOLVE_POOL: Question[] = [
   {
-    prompt: <>לאן נפתר V42 — ומדוע?</>,
+    prompt: <>לאן נפתר <Rn n="V42" /> — ומדוע?</>,
     options: ["אל I6, כי הבס (הספטימה) חייב לרדת אל 3", "אל I במצב יסודי", "אל V6", "לאן שנרצה"],
     answer: "אל I6, כי הבס (הספטימה) חייב לרדת אל 3",
     explain: <>הדיסוננס יושב בבס עצמו — פה יורדת אל מי, ולכן הטוניקה מגיעה בהכרח בהיפוך ראשון.</>,
@@ -124,10 +124,10 @@ const RESOLVE_POOL: Question[] = [
     explain: <>אותה הקלה שפגשנו ב־VII6: תנועת מעבר צעדית עם הבס מרככת את דין הדיסוננס.</>,
   },
   {
-    prompt: <>‏V43 ו־VII6 חולקים את אותו תפקיד. מהו?</>,
+    prompt: <>‏<Rn n="V43" /> ו־VII6 חולקים את אותו תפקיד. מהו?</>,
     options: ["אקורד מעבר בין I ל־I6, עם 2 בבס", "סיום קדנצה", "שכן עליון ל־V", "תחליף לסובדומיננטה"],
     answer: "אקורד מעבר בין I ל־I6, עם 2 בבס",
-    explain: <>‏V43 הוא למעשה VII6 בתוספת סול — דומיננטה מלאה שמגשרת בין שני מצבי הטוניקה.</>,
+    explain: <>‏<Rn n="V43" /> הוא למעשה VII6 בתוספת סול — דומיננטה מלאה שמגשרת בין שני מצבי הטוניקה.</>,
   },
   {
     prompt: <>הבס מנגן סול–פה–מי מתחת לדומיננטה מתמשכת. אילו אקורדים אלה?</>,
@@ -157,7 +157,7 @@ function figureQuestion(): Question {
     ),
     answer: q.fig,
     answerLabel: <Fig n={q.fig} />,
-    explain: <>הספרות מונות את המרווחים שמעל הבס: 7 — מצב יסודי; 6/5 — טרצה בבס; 4/3 — קווינטה בבס; 4/2 — ספטימה בבס.</>,
+    explain: <FigText text="הספרות מונות את המרווחים שמעל הבס: 7 — מצב יסודי; ‏6/5 — טרצה בבס; ‏4/3 — קווינטה בבס; ‏4/2 — ספטימה בבס." />,
   };
 }
 
@@ -178,7 +178,7 @@ export function Unit09() {
     <div className="lesson">
       <header className="lesson-hero">
         <div className="unit-label">יחידה 9 · חלק שני</div>
-        <h1>היפוכי V7: ‏6/5, ‏4/3 ו־4/2</h1>
+        <h1><FigText text="היפוכי V7: ‏6/5, ‏4/3 ו־4/2" /></h1>
         <p className="lede">
           מה שעשינו ביחידה 8 למשולשים נעשה עכשיו לספטאקורד הדומיננטה. לְ־V7 ארבעה צלילים — ולכן שלושה
           היפוכים, וכל אחד שם בבס דרגה פעילה אחרת: הצליל המוביל, הסופרטוניקה או הסובדומיננטה. הבס מקבל
@@ -216,9 +216,9 @@ export function Unit09() {
 
       <Section id="v65" num="9.2" title="‏V65 — כמו V6, עם עוד עוקץ">
         <p>
-          ‏V65 הוא אחיו החריף של V6: אותו צליל מוביל בבס, אותה משיכה מעלה אל הטוניקה — ובנוסף הספטימה{" "}
+          ‏<Rn n="V65" /> הוא אחיו החריף של V6: אותו צליל מוביל בבס, אותה משיכה מעלה אל הטוניקה — ובנוסף הספטימה{" "}
           <Deg n="4" kind="active" /> באחד הקולות העליונים, שיורדת בצעד אל <Deg n="3" kind="stable" />.
-          שתי חובות פתרון, שתיהן מתקיימות, והכול נשאר שלם. כמו V6, גם V65 חי צמוד ל־I — שכן תחתון של
+          שתי חובות פתרון, שתיהן מתקיימות, והכול נשאר שלם. כמו V6, גם <Rn n="V65" /> חי צמוד ל־I — שכן תחתון של
           הבס:
         </p>
         <Widget
@@ -231,8 +231,8 @@ export function Unit09() {
 
       <Section id="v43" num="9.3" title="‏V43 — אקורד המעבר, גרסת הדומיננטה המלאה">
         <p>
-          הבס של V43 הוא <Deg n="2" kind="active" /> — בדיוק הבס של VII6 מיחידה 8, ובדיוק אותו תפקיד:
-          לגשר בין I ל־I6 בקו דו–רה–מי. ההבדל? V43 מוסיף את סול, כך שהמעבר נעשה עם דומיננטה מלאה.
+          הבס של <Rn n="V43" /> הוא <Deg n="2" kind="active" /> — בדיוק הבס של VII6 מיחידה 8, ובדיוק אותו תפקיד:
+          לגשר בין I ל־I6 בקו דו–רה–מי. ההבדל? <Rn n="V43" /> מוסיף את סול, כך שהמעבר נעשה עם דומיננטה מלאה.
           ולספטימה שלו יש כאן זכות מיוחדת — שתי הדרכים:
         </p>
         <Widget
@@ -259,7 +259,7 @@ export function Unit09() {
             label={`מעבר I–V43–I6: ${v43Form.he}`}
           />
           <p style={{ direction: "rtl", color: "var(--ink-soft)", fontSize: "0.9rem", margin: "0.5rem 0 0" }}>
-            {v43Form.note}
+            <FigText text={v43Form.note} />
           </p>
         </Widget>
       </Section>
@@ -267,7 +267,7 @@ export function Unit09() {
       <Section id="v42" num="9.4" title="‏V42 — הדיסוננס יורד לבס">
         <p>
           בהיפוך השלישי הספטימה עצמה יושבת בבס — ומכאן נגזר הכול: הבס <em className="hl">חייב</em> לרדת
-          בצעד אל <Deg n="3" kind="stable" />, ולכן V42 נפתר תמיד אל <b>I6</b>, לעולם לא אל I במצב
+          בצעד אל <Deg n="3" kind="stable" />, ולכן <Rn n="V42" /> נפתר תמיד אל <b>I6</b>, לעולם לא אל I במצב
           יסודי. התבנית האהובה: הבס צועד סול–פה–מי, מהיסוד של V אל הספטימה ואל הפתרון, בעוד הקולות
           העליונים כמעט עומדים:
         </p>
@@ -278,8 +278,8 @@ export function Unit09() {
           <SatbScores chords={V42_MOVE} marks={V42_MARKS} highlight={v42Player.index} width={360} label="מהלך I–V–V42–I6" />
         </Widget>
         <Callout label="דקות חשובה">
-          שימו לב מה קרה בין V ל־V42: רק הבס זז. הוספת ספטימה מתחת לאקורד קיים היא דרך שכיחה להצית
-          תנועה — הדומיננטה הייתה יציבה־יחסית, ופתאום הבס עצמו דיסוננטי וחייב להמשיך. V42 הוא מנוע
+          שימו לב מה קרה בין V ל־<Rn n="V42" />: רק הבס זז. הוספת ספטימה מתחת לאקורד קיים היא דרך שכיחה להצית
+          תנועה — הדומיננטה הייתה יציבה־יחסית, ופתאום הבס עצמו דיסוננטי וחייב להמשיך. <Rn n="V42" /> הוא מנוע
           קטן של \"עוד לא נגמר\".
         </Callout>
       </Section>
@@ -326,14 +326,14 @@ export function Unit09() {
 
       <Section id="review" num="9.7" title="נקודות לחזרה">
         <div className="review-grid">
-          <div className="review-chip"><b>שלושה היפוכים</b>‏6/5 — צליל מוביל בבס; 4/3 — סופרטוניקה; 4/2 — הספטימה עצמה.</div>
+          <div className="review-chip"><b>שלושה היפוכים</b><FigText text="‏6/5 — צליל מוביל בבס; ‏4/3 — סופרטוניקה; ‏4/2 — הספטימה עצמה." /></div>
           <div className="review-chip"><b>הכול שלם</b>בהיפוכים אין השמטות ואין הכפלות — ארבעה צלילים, ארבעה קולות.</div>
-          <div className="review-chip"><b>V65</b>שכן תחתון ל־I: הבס עולה אל 1, הספטימה יורדת אל 3.</div>
-          <div className="review-chip"><b>V43</b>אקורד מעבר בין I ל־I6 — ‏VII6 בתוספת היסוד.</div>
-          <div className="review-chip"><b>ההקלה</b>רק ב־V43 עובר: הספטימה רשאית לעלות אל 5 בטרצות עם הבס.</div>
-          <div className="review-chip"><b>V42</b>הבס חייב לרדת בצעד — הפתרון תמיד I6, לעולם לא I.</div>
-          <div className="review-chip"><b>סול–פה–מי</b>‏V–V42–I6: הבס צועד אל הספטימה, הקולות העליונים מחזיקים.</div>
-          <div className="review-chip"><b>במינור</b>ההגבהה של 7 מגיעה לבס עצמו — דיאז לפני תו הבס של V65.</div>
+          <div className="review-chip"><b><Rn n="V65" /></b>שכן תחתון ל־I: הבס עולה אל 1, הספטימה יורדת אל 3.</div>
+          <div className="review-chip"><b><Rn n="V43" /></b>אקורד מעבר בין I ל־I6 — ‏VII6 בתוספת היסוד.</div>
+          <div className="review-chip"><b>ההקלה</b>רק ב־<Rn n="V43" /> עובר: הספטימה רשאית לעלות אל 5 בטרצות עם הבס.</div>
+          <div className="review-chip"><b><Rn n="V42" /></b>הבס חייב לרדת בצעד — הפתרון תמיד I6, לעולם לא I.</div>
+          <div className="review-chip"><b>סול–פה–מי</b><FigText text="‏V–V42–I6: " />הבס צועד אל הספטימה, הקולות העליונים מחזיקים.</div>
+          <div className="review-chip"><b>במינור</b>ההגבהה של 7 מגיעה לבס עצמו — דיאז לפני תו הבס של <Rn n="V65" />.</div>
         </div>
       </Section>
 

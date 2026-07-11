@@ -229,17 +229,33 @@ export function Score({
         svg.appendChild(c);
       }
       if (n.mark) {
-        const t = document.createElementNS(NS, "text");
-        t.setAttribute("x", String(x));
-        t.setAttribute("y", String(labelY - 2));
-        t.setAttribute("text-anchor", "middle");
-        t.setAttribute("font-size", "13");
-        t.setAttribute("font-style", "italic");
-        t.setAttribute("font-weight", "600");
-        t.setAttribute("font-family", NOTE_FONT);
-        t.setAttribute("fill", colorOf(n.kind));
-        t.textContent = n.mark;
-        svg.appendChild(t);
+        // "V65"-style marks engrave as roman numeral + stacked figure
+        const rm = /^([IVXivx]+)(\d)(\d)$/.exec(n.mark);
+        const roman = document.createElementNS(NS, "text");
+        roman.setAttribute("x", String(rm ? x - 2 : x));
+        roman.setAttribute("y", String(labelY - 2));
+        roman.setAttribute("text-anchor", rm ? "end" : "middle");
+        roman.setAttribute("font-size", "13");
+        roman.setAttribute("font-style", "italic");
+        roman.setAttribute("font-weight", "600");
+        roman.setAttribute("font-family", NOTE_FONT);
+        roman.setAttribute("fill", colorOf(n.kind));
+        roman.textContent = rm ? rm[1] : n.mark;
+        svg.appendChild(roman);
+        if (rm) {
+          [rm[2], rm[3]].forEach((d, row) => {
+            const t = document.createElementNS(NS, "text");
+            t.setAttribute("x", String(x - 1));
+            t.setAttribute("y", String(labelY - 10 + row * 8));
+            t.setAttribute("text-anchor", "start");
+            t.setAttribute("font-size", "8.5");
+            t.setAttribute("font-weight", "700");
+            t.setAttribute("font-family", NOTE_FONT);
+            t.setAttribute("fill", colorOf(n.kind));
+            t.textContent = d;
+            svg.appendChild(t);
+          });
+        }
       }
       if (n.fig) {
         const digits = n.fig.split("/");
