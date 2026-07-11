@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Accidental, BarNote, Barline, Beam, Dot, Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
+import { Accidental, BarNote, Barline, Beam, Dot, Formatter, Renderer, Stave, StaveNote, StaveTie, Voice } from "vexflow";
 import { playNote } from "../engine/audio";
 
 export type ScoreNote = {
@@ -12,6 +12,8 @@ export type ScoreNote = {
   degree?: string;           // scale-degree number drawn with a caret above
   mark?: string;             // plain marking above (P, N, ½ …)
   sub?: string;              // Hebrew label below
+  fig?: string;              // figured-bass numbers below, stacked ("6/4" → 6 over 4)
+  tie?: boolean;             // tie this note to the next one
   bar?: boolean;             // entry is a barline, not a note (keys/midi ignored)
 };
 
@@ -75,7 +77,8 @@ export function Score({
 
     const w = width ?? Math.max(300, 90 + notes.length * 58);
     const hasBelow = notes.some((n) => n.sub);
-    const h = 150 + (hasBelow ? 26 : 0);
+    const hasFig = notes.some((n) => n.fig);
+    const h = 150 + (hasFig ? 34 : 0) + (hasBelow ? 26 : 0);
 
     const renderer = new Renderer(host, Renderer.Backends.SVG);
     renderer.resize(w, h);
@@ -136,6 +139,25 @@ export function Score({
     new Formatter(even ? { softmaxFactor: 1 } : undefined).joinVoices([voice]).format([voice], w - 90);
     voice.draw(context, stave);
     beams.forEach((b) => b.setContext(context).draw());
+    notes.forEach((n, i) => {
+      const a = vexNotes[i];
+      const b = vexNotes[i + 1];
+      if (n.tie && a instanceof StaveNote && b instanceof StaveNote) {
+        // tie only the notes the two entries share (a held voice inside a chord)
+        const firstIndexes: number[] = [];
+        const lastIndexes: number[] = [];
+        n.keys.forEach((k, ki) => {
+          const li = notes[i + 1].keys.indexOf(k);
+          if (li >= 0) {
+            firstIndexes.push(ki);
+            lastIndexes.push(li);
+          }
+        });
+        if (firstIndexes.length) {
+          new StaveTie({ firstNote: a, lastNote: b, firstIndexes, lastIndexes }).setContext(context).draw();
+        }
+      }
+    });
 
     const svg = host.querySelector("svg")!;
     svg.setAttribute("role", "img");
@@ -174,11 +196,13 @@ export function Score({
     // Degrees and marks sit just above the staff (or the highest notehead),
     // not at a fixed height — a fixed y left them floating far above the staff.
     const staffTop = stave.getYForLine(0);
-    const noteTops = vexNotes.map((vn) => {
-      const bb = vn.getBoundingBox();
-      return bb ? bb.getY() : staffTop;
-    });
+    const staffBottom = stave.getYForLine(4);
+    const boxes = vexNotes.map((vn) => vn.getBoundingBox());
+    const noteTops = boxes.map((bb) => (bb ? bb.getY() : staffTop));
+    const noteBottoms = boxes.map((bb) => (bb ? bb.getY() + bb.getH() : staffBottom));
     const labelY = Math.max(20, Math.min(staffTop, ...noteTops) - 8);
+    // figured-bass digits stack right under the staff (or the lowest notehead)
+    const figY = Math.max(staffBottom, ...noteBottoms) + 16;
     const NS = "http://www.w3.org/2000/svg";
     vexNotes.forEach((vn, i) => {
       const n = notes[i];
@@ -216,6 +240,22 @@ export function Score({
         t.setAttribute("fill", colorOf(n.kind));
         t.textContent = n.mark;
         svg.appendChild(t);
+      }
+      if (n.fig) {
+        const digits = n.fig.split("/");
+        digits.forEach((d, row) => {
+          const t = document.createElementNS(NS, "text");
+          t.setAttribute("x", String(x));
+          // single figures sit on the lower row, where the "3" of 5/3 would be
+          t.setAttribute("y", String(figY + (digits.length === 1 ? 14 : row * 14)));
+          t.setAttribute("text-anchor", "middle");
+          t.setAttribute("font-size", "13.5");
+          t.setAttribute("font-weight", "600");
+          t.setAttribute("font-family", NOTE_FONT);
+          t.setAttribute("fill", cssVar("--ink"));
+          t.textContent = d;
+          svg.appendChild(t);
+        });
       }
       if (n.sub) {
         const t = document.createElementNS(NS, "text");

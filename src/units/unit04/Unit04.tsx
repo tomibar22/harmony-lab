@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
-import { Callout, Deg, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
+import { Callout, Deg, Fig, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
 import { SeqEvent } from "../../engine/audio";
 
 /* ---------------- triad qualities on C ---------------- */
@@ -67,9 +67,9 @@ const DEGREE_TRIAD_SETS = [
 /* ---------------- inversions of the C triad ---------------- */
 
 const INVERSIONS: ScoreNote[] = [
-  { keys: ["c/4", "e/4", "g/4"], midi: [60, 64, 67], sub: "מצב יסודי · 5/3" },
-  { keys: ["e/4", "g/4", "c/5"], midi: [64, 67, 72], sub: "היפוך ראשון · 6" },
-  { keys: ["g/4", "c/5", "e/5"], midi: [67, 72, 76], sub: "היפוך שני · 6/4" },
+  { keys: ["c/4", "e/4", "g/4"], midi: [60, 64, 67], fig: "5/3", sub: "מצב יסודי" },
+  { keys: ["e/4", "g/4", "c/5"], midi: [64, 67, 72], fig: "6", sub: "היפוך ראשון" },
+  { keys: ["g/4", "c/5", "e/5"], midi: [67, 72, 76], fig: "6/4", sub: "היפוך שני" },
 ];
 
 /* ---------------- seventh-chord qualities on C ---------------- */
@@ -115,10 +115,10 @@ const SEVENTH_QUALITIES = [
 /* ---------------- V7 in C and its inversions ---------------- */
 
 const V7_INVERSIONS: ScoreNote[] = [
-  { keys: ["g/3", "b/3", "d/4", "f/4"], midi: [55, 59, 62, 65], sub: "מצב יסודי · 7" },
-  { keys: ["b/3", "d/4", "f/4", "g/4"], midi: [59, 62, 65, 67], sub: "היפוך ראשון · 6/5" },
-  { keys: ["d/4", "f/4", "g/4", "b/4"], midi: [62, 65, 67, 71], sub: "היפוך שני · 4/3" },
-  { keys: ["f/4", "g/4", "b/4", "d/5"], midi: [65, 67, 71, 74], sub: "היפוך שלישי · 4/2" },
+  { keys: ["g/3", "b/3", "d/4", "f/4"], midi: [55, 59, 62, 65], fig: "7", sub: "מצב יסודי" },
+  { keys: ["b/3", "d/4", "f/4", "g/4"], midi: [59, 62, 65, 67], fig: "6/5", sub: "היפוך ראשון" },
+  { keys: ["d/4", "f/4", "g/4", "b/4"], midi: [62, 65, 67, 71], fig: "4/3", sub: "היפוך שני" },
+  { keys: ["f/4", "g/4", "b/4", "d/5"], midi: [65, 67, 71, 74], fig: "4/2", sub: "היפוך שלישי" },
 ];
 
 const CADENCE_SEQ: SeqEvent[] = [
@@ -166,17 +166,30 @@ function degreeTriadQuestion(): Question {
 }
 
 const TRIAD_POSITIONS = [
-  { member: "היסוד", answer: "מצב יסודי (5/3)" },
-  { member: "הטרצה", answer: "היפוך ראשון (6)" },
-  { member: "הקווינטה", answer: "היפוך שני (6/4)" },
+  { member: "היסוד", name: "מצב יסודי", fig: "5/3" },
+  { member: "הטרצה", name: "היפוך ראשון", fig: "6" },
+  { member: "הקווינטה", name: "היפוך שני", fig: "6/4" },
 ] as const;
+
+const positionOption = (name: string, fig: string) => ({
+  value: name,
+  label: (
+    <>
+      {name} <Fig n={fig} />
+    </>
+  ),
+});
 
 function inversionQuestion(): Question {
   const q = pick(TRIAD_POSITIONS);
   return {
     prompt: <>במשולש, כאשר <b>{q.member}</b> בבס — מהו מצב האקורד?</>,
-    options: shuffle([...TRIAD_POSITIONS.map((p) => p.answer), "היפוך שלישי (4/2)"]),
-    answer: q.answer,
+    options: shuffle([
+      ...TRIAD_POSITIONS.map((p) => positionOption(p.name, p.fig)),
+      positionOption("היפוך שלישי", "4/2"),
+    ]),
+    answer: q.name,
+    answerLabel: positionOption(q.name, q.fig).label,
     explain: <>היפוך שלישי קיים רק בספטאקורד — כשהספטימה בבס. הספרות מציינות מרווחים מעל הבס.</>,
   };
 }
@@ -192,9 +205,15 @@ function seventhFigureQuestion(): Question {
   const q = pick(SEVENTH_POSITIONS);
   return {
     prompt: <>בספטאקורד, כאשר <b>{q.member}</b> בבס — מהו הספרור?</>,
-    options: shuffle(SEVENTH_POSITIONS.map((p) => p.fig)),
+    options: shuffle(SEVENTH_POSITIONS.map((p) => ({ value: p.fig, label: <Fig n={p.fig} /> }))),
     answer: q.fig,
-    explain: <>סדרת הזיכרון: 7 — 6/5 — 4/3 — 4/2, מהמצב היסודי להיפוך השלישי.</>,
+    answerLabel: <Fig n={q.fig} />,
+    explain: (
+      <>
+        סדרת הזיכרון: <Fig n="7" /> — <Fig n="6/5" /> — <Fig n="4/3" /> — <Fig n="4/2" />, מהמצב היסודי
+        להיפוך השלישי.
+      </>
+    ),
   };
 }
 
@@ -351,8 +370,8 @@ export function Unit04() {
           המשולש שומר על זהותו גם כשמסדרים את צליליו אחרת. השאלה המכרעת היא <em className="hl">מי בבס</em>:
           היסוד — <b>מצב יסודי</b>; הטרצה — <b>היפוך ראשון</b>; הקווינטה — <b>היפוך שני</b>. הספרות שליד כל
           מצב הן שיטת ה<Term he="בס ממוספר" en="Figured bass" def="סימון בארוקי: ספרות מתחת לתו הבס המציינות את המרווחים שמעליו. 5/3 מקוצר לכלום, 6/3 ל־6, ו־6/4 נשאר כפי שהוא." /> —
-          הן מונות את המרווחים שמעל הבס (ובקיצור המקובל: מצב יסודי בלי ספרות כלל, היפוך ראשון —{" "}
-          <span dir="ltr">6</span>, היפוך שני — <span dir="ltr">6/4</span>):
+          הן מונות את המרווחים שמעל הבס, ספרה על גבי ספרה — <Fig n="5/3" /> — ובקיצור המקובל: מצב יסודי
+          בלי ספרות כלל, היפוך ראשון — <Fig n="6" />, היפוך שני — <Fig n="6/4" />:
         </p>
         <Widget
           title="אותו משולש, שלושה מצבים — הקשיבו איך הצבע משתנה"
@@ -458,9 +477,9 @@ export function Unit04() {
           <div className="review-chip"><b>ארבע איכויות</b>מז'ורי, מינורי (קונסוננטיים); מוקטן, מוגדל (דיסוננטיים).</div>
           <div className="review-chip"><b>במז'ור</b>מז'וריים: I, IV, V; מינוריים: ii, iii, vi; מוקטן: vii°.</div>
           <div className="review-chip"><b>ספרות רומיות</b>גדולה = מז'ורי, קטנה = מינורי, ° = מוקטן.</div>
-          <div className="review-chip"><b>מצבי המשולש</b>יסוד בבס — 5/3; טרצה — 6; קווינטה — 6/4.</div>
+          <div className="review-chip"><b>מצבי המשולש</b>יסוד בבס — <Fig n="5/3" />; טרצה — <Fig n="6" />; קווינטה — <Fig n="6/4" />.</div>
           <div className="review-chip"><b>ספטאקורד</b>משולש + ספטימה; תמיד דיסוננטי, תמיד ממשיך הלאה.</div>
-          <div className="review-chip"><b>מצבי הספטאקורד</b>7 — 6/5 — 4/3 — 4/2.</div>
+          <div className="review-chip"><b>מצבי הספטאקורד</b><Fig n="7" /> — <Fig n="6/5" /> — <Fig n="4/3" /> — <Fig n="4/2" />.</div>
           <div className="review-chip"><b>V7</b>צליל מוביל + טריטון + ספטימה — כולם מצביעים אל הטוניקה.</div>
         </div>
       </Section>

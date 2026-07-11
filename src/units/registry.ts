@@ -42,6 +42,20 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit04/Unit04").then((m) => ({ default: m.Unit04 }))),
   },
-  { id: "05", num: 5, title: "מבוא לקונטרפונקט", blurb: "חמשת המינים וקאנטוס פירמוס.", ready: false },
-  { id: "06", num: 6, title: "כתיבה בארבעה קולות", blurb: "בניית אקורדים והובלת קולות במרקם כוראלי.", ready: false },
+  {
+    id: "05",
+    num: 5,
+    title: "מבוא לקונטרפונקט",
+    blurb: "קאנטוס פירמוס, סוגי תנועה, חמשת המינים וההשהיה.",
+    ready: true,
+    component: lazy(() => import("./unit05/Unit05").then((m) => ({ default: m.Unit05 }))),
+  },
+  {
+    id: "06",
+    num: 6,
+    title: "כתיבה בארבעה קולות",
+    blurb: "SATB, טווחים ופריסות, הכפלות, מקבילות אסורות וקדנצה שלמה.",
+    ready: true,
+    component: lazy(() => import("./unit06/Unit06").then((m) => ({ default: m.Unit06 }))),
+  },
 ];

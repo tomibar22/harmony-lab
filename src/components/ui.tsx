@@ -16,6 +16,18 @@ export function Deg({ n, kind }: { n: string | number; kind?: "stable" | "active
   );
 }
 
+/* ---------- figured-bass numbers, stacked in the traditional layout ---------- */
+export function Fig({ n }: { n: string }) {
+  const digits = n.split("/");
+  return (
+    <span className="fig" aria-label={`ספרור ${n}`} dir="ltr">
+      {digits.map((d, i) => (
+        <span key={i}>{d}</span>
+      ))}
+    </span>
+  );
+}
+
 /* ---------- play button bound to a sequence player ---------- */
 export function PlayButton({
   label,
