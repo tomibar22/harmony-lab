@@ -13,7 +13,7 @@ export const UNITS: UnitMeta[] = [
   {
     id: "01",
     num: 1,
-    title: "מפתח, סולמות ומודוסים",
+    title: "סולמות, דרגות ומודוסים",
     blurb: "טוניקה ודרגות, יציב ופעיל, סימני היתק, שלוש צורות המינור ושבעת המודוסים.",
     ready: true,
     component: lazy(() => import("./unit01/Unit01").then((m) => ({ default: m.Unit01 }))),

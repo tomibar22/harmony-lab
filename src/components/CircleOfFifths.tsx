@@ -20,6 +20,18 @@ const POSITIONS: { majors: MajorKey[]; minorLabel: string }[] = [
   { majors: [MAJOR_KEYS[8]], minorLabel: "רה" },        // F
 ];
 
+/** English display name from the VexFlow key, e.g. "Bb" → "B♭". */
+function engName(k: MajorKey): string {
+  return k.vex.length === 1 ? k.vex : k.vex[0] + (k.vex[1] === "#" ? "♯" : "♭");
+}
+
+/** SVG text is laid out LTR regardless of the page direction, which pushes a
+ *  trailing ♭/♯ to the wrong side of a Hebrew name. Wrapping in RLM marks makes
+ *  the neutral accidental resolve RTL and sit after (left of) the letters. */
+function rtl(s: string): string {
+  return `‏${s}‏`;
+}
+
 export function CircleOfFifths() {
   const [selected, setSelected] = useState<MajorKey>(MAJOR_KEYS[0]);
   const player = useSequencePlayer();
@@ -49,13 +61,16 @@ export function CircleOfFifths() {
           const ym = cy + (R - 52) * Math.sin(angle);
           const isSel = pos.majors.some((k) => k.vex === selected.vex);
           const label = pos.majors.map((k) => k.name).join(" / ");
+          const eng = pos.majors.map(engName).join("/");
+          const heb = pos.majors.map((k) => k.name).join("/");
+          const pair = pos.majors.length > 1;
           return (
             <g
               key={i}
               className="key-node"
               role="button"
               tabIndex={0}
-              aria-label={`מפתח ${label} מז'ור`}
+              aria-label={`סולם ${label} מז'ור`}
               onClick={() => setSelected(pos.majors[0])}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -73,11 +88,14 @@ export function CircleOfFifths() {
                 strokeWidth={isSel ? 2.5 : 1.2}
                 style={{ transition: "all .25s" }}
               />
-              <text x={x} y={y + 4.5} textAnchor="middle" fontSize={pos.majors.length > 1 ? 9.5 : 13} fontWeight={700} fill="var(--ink)">
-                {label}
+              <text x={x} y={y + (pair ? 0.5 : 1)} textAnchor="middle" fontSize={pair ? 10 : 13.5} fontWeight={700} fill="var(--ink)">
+                {eng}
+              </text>
+              <text x={x} y={y + 12.5} textAnchor="middle" fontSize={pair ? 7.5 : 8.5} fill="var(--ink-soft)">
+                {rtl(heb)}
               </text>
               <text x={xm} y={ym + 3.5} textAnchor="middle" fontSize={10} fill="var(--ink-soft)">
-                {pos.minorLabel}
+                {rtl(pos.minorLabel)}
               </text>
             </g>
           );
@@ -90,7 +108,12 @@ export function CircleOfFifths() {
         </text>
       </svg>
       <div className="panel">
-        <h4>{selected.name} מז'ור</h4>
+        <h4>
+          {selected.name} מז'ור{" "}
+          <small dir="ltr" style={{ color: "var(--ink-soft)", fontWeight: 600 }}>
+            · {engName(selected)} major
+          </small>
+        </h4>
         <div className="row">
           סימני היתק: <b>{signatureLabel(selected.sharps)}</b>
         </div>

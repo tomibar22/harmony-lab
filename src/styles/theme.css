@@ -230,7 +230,7 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
   font-variant-numeric: tabular-nums; font-weight: 700;
 }
 .deg .caret {
-  position: absolute; top: -0.62em; inset-inline-start: 50%;
+  position: absolute; top: -0.34em; inset-inline-start: 50%;
   transform: translateX(50%); font-size: 0.55em; line-height: 1;
 }
 [dir="ltr"] .deg .caret { transform: translateX(-50%); }

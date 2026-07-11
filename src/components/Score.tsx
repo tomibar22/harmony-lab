@@ -163,13 +163,21 @@ export function Score({
       return el;
     });
 
-    // labels drawn inside the SVG so responsive scaling keeps alignment
+    // labels drawn inside the SVG so responsive scaling keeps alignment.
+    // Degrees and marks sit just above the staff (or the highest notehead),
+    // not at a fixed height — a fixed y left them floating far above the staff.
+    const staffTop = stave.getYForLine(0);
+    const noteTops = vexNotes.map((vn) => {
+      const bb = vn.getBoundingBox();
+      return bb ? bb.getY() : staffTop;
+    });
+    const labelY = Math.max(20, Math.min(staffTop, ...noteTops) - 8);
     const NS = "http://www.w3.org/2000/svg";
     vexNotes.forEach((vn, i) => {
       const n = notes[i];
       const x = vn.getAbsoluteX() + 6;
       if (n.degree) {
-        const y = 20;
+        const y = labelY;
         const t = document.createElementNS(NS, "text");
         t.setAttribute("x", String(x));
         t.setAttribute("y", String(y));
@@ -192,7 +200,7 @@ export function Score({
       if (n.mark) {
         const t = document.createElementNS(NS, "text");
         t.setAttribute("x", String(x));
-        t.setAttribute("y", "18");
+        t.setAttribute("y", String(labelY - 2));
         t.setAttribute("text-anchor", "middle");
         t.setAttribute("font-size", "13");
         t.setAttribute("font-style", "italic");
