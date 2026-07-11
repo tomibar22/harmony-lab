@@ -3,50 +3,7 @@ import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, Deg, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
 import { NextUnit } from "../../components/NextUnit";
-import { SeqEvent } from "../../engine/audio";
-
-/* ---------------- SATB layout: two staves rendered as two stacked Scores ---------------- */
-
-type Satb = { s: [string, number]; a: [string, number]; t: [string, number]; b: [string, number] };
-
-const chordSeq = (chords: Satb[], durBeats = 1.4): SeqEvent[] =>
-  chords.map((c, i) => ({
-    midi: [c.b[1], c.t[1], c.a[1], c.s[1]],
-    time: i * durBeats,
-    dur: durBeats * 1.04,
-    idx: i,
-  }));
-
-/** Upper staff: soprano + alto. Lower staff: tenor + bass. */
-function SatbScores({
-  chords,
-  marks,
-  highlight,
-  width,
-  label,
-}: {
-  chords: Satb[];
-  marks?: (string | undefined)[];
-  highlight: number | null;
-  width?: number;
-  label: string;
-}) {
-  const upper: ScoreNote[] = chords.map((c, i) => ({
-    keys: [c.a[0], c.s[0]],
-    midi: [c.a[1], c.s[1]],
-    mark: marks?.[i],
-  }));
-  const lower: ScoreNote[] = chords.map((c) => ({
-    keys: [c.b[0], c.t[0]],
-    midi: [c.b[1], c.t[1]],
-  }));
-  return (
-    <div style={{ display: "grid", gap: "0.15rem" }}>
-      <Score notes={upper} width={width} highlightIndex={highlight} ariaLabel={`${label} — סופרן ואלט`} />
-      <Score notes={lower} clef="bass" width={width} highlightIndex={highlight} ariaLabel={`${label} — טנור ובס`} />
-    </div>
-  );
-}
+import { Satb, SatbScores, chordSeq } from "../../components/Satb";
 
 /* ---------------- the voices and their ranges ---------------- */
 
@@ -397,8 +354,8 @@ export function Unit06() {
       </Section>
 
       <NextUnit current={6}>
-        <b>סיימתם את שש יחידות היסוד!</b> מכאן נפתח לב הספר — הפרוגרסיות ההרמוניות, החל ב־I–V–I. יחידות
-        נוספות יתווספו בהמשך.
+        <b>סיימתם את חלק היסודות!</b> מכאן נפתח לב הספר — יחידה 7 פותחת את חלק ב' עם ציר הטוניקה
+        והדומיננטה: I, V ו־V7, והקדנצות הראשונות.
       </NextUnit>
     </div>
   );
