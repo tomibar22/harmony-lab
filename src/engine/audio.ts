@@ -12,11 +12,12 @@ export type SeqEvent = {
 };
 
 let synth: Tone.PolySynth<Tone.Synth> | null = null;
+let reverb: Tone.Reverb | null = null;
 
 async function ensureAudio(): Promise<Tone.PolySynth<Tone.Synth>> {
   await Tone.start();
+  if (!reverb) reverb = new Tone.Reverb({ decay: 1.7, wet: 0.16 }).toDestination();
   if (!synth) {
-    const reverb = new Tone.Reverb({ decay: 1.7, wet: 0.16 }).toDestination();
     synth = new Tone.PolySynth(Tone.Synth, {
       volume: -9,
       oscillator: { type: "triangle" },
@@ -24,6 +25,14 @@ async function ensureAudio(): Promise<Tone.PolySynth<Tone.Synth>> {
     }).connect(reverb);
   }
   return synth;
+}
+
+/** Hard stop: events are pre-scheduled on the audio clock, and releaseAll only
+ *  frees notes already sounding — disposing the synth is what cancels the rest.
+ *  The next play lazily builds a fresh synth into the shared reverb. */
+function cancelScheduled() {
+  synth?.dispose();
+  synth = null;
 }
 
 export async function playNote(midi: number | number[], durSec = 0.9, vel = 0.8) {
@@ -44,7 +53,7 @@ export function useSequencePlayer() {
   const stop = useCallback(() => {
     timeouts.current.forEach(clearTimeout);
     timeouts.current = [];
-    synth?.releaseAll();
+    cancelScheduled();
     setPlaying(false);
     setIndex(null);
   }, []);

@@ -34,7 +34,14 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit03/Unit03").then((m) => ({ default: m.Unit03 }))),
   },
-  { id: "04", num: 4, title: "משולשים וספטאקורדים", blurb: "אבני הבניין של ההרמוניה הטונאלית.", ready: false },
+  {
+    id: "04",
+    num: 4,
+    title: "משולשים וספטאקורדים",
+    blurb: "ארבע איכויות, ספרות רומיות, היפוכים ובס ממוספר, וספטאקורד הדומיננטה.",
+    ready: true,
+    component: lazy(() => import("./unit04/Unit04").then((m) => ({ default: m.Unit04 }))),
+  },
   { id: "05", num: 5, title: "מבוא לקונטרפונקט", blurb: "חמשת המינים וקאנטוס פירמוס.", ready: false },
   { id: "06", num: 6, title: "כתיבה בארבעה קולות", blurb: "בניית אקורדים והובלת קולות במרקם כוראלי.", ready: false },
 ];
