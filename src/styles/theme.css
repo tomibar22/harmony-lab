@@ -115,6 +115,12 @@ button { font-family: var(--font-body); }
 .home h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); margin: 0 0 1rem; }
 .home .lede { font-size: 1.15rem; color: var(--ink-soft); max-width: 58ch; margin: 0 0 2.5rem; }
 .units-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.home-part { margin-bottom: 3rem; }
+.home-part .part-title {
+  font-size: 1.35rem; margin: 0 0 0.2rem;
+  color: var(--ink); border-inline-start: 4px solid var(--gold); padding-inline-start: 0.75rem;
+}
+.home-part .part-desc { color: var(--ink-soft); font-size: 0.92rem; margin: 0 0 1.25rem; padding-inline-start: calc(0.75rem + 4px); }
 .unit-card {
   display: block; text-decoration: none; color: inherit;
   background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius);

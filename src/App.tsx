@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from "react";
-import { UNITS } from "./units/registry";
+import { PARTS, UNITS } from "./units/registry";
 
 function useHashRoute(): string {
   const [hash, setHash] = useState(window.location.hash);
@@ -86,25 +86,31 @@ function Home() {
         מסע אינטראקטיבי בהרמוניה טונאלית ובהובלת קולות, יחידה אחר יחידה, בעקבות המהלך הפדגוגי של
         אלדוול ושכטר — בעיבוד עברי מקורי שבו כל דוגמה נשמעת וכל מושג נבדק.
       </p>
-      <div className="units-grid">
-        {UNITS.map((u) =>
-          u.ready ? (
-            <a key={u.id} className="unit-card ready" href={`#/unit/${u.id}`}>
-              <div className="u-num">{u.num}</div>
-              <h3>{u.title}</h3>
-              <p>{u.blurb}</p>
-              <span className="badge">מוכן ללמידה</span>
-            </a>
-          ) : (
-            <div key={u.id} className="unit-card soon" aria-disabled>
-              <div className="u-num">{u.num}</div>
-              <h3>{u.title}</h3>
-              <p>{u.blurb}</p>
-              <span className="badge">בקרוב</span>
-            </div>
-          )
-        )}
-      </div>
+      {PARTS.map((part) => (
+        <section key={part.num} className="home-part">
+          <h2 className="part-title">{part.title}</h2>
+          <p className="part-desc">{part.desc}</p>
+          <div className="units-grid">
+            {UNITS.filter((u) => u.part === part.num).map((u) =>
+              u.ready ? (
+                <a key={u.id} className="unit-card ready" href={`#/unit/${u.id}`}>
+                  <div className="u-num">{u.num}</div>
+                  <h3>{u.title}</h3>
+                  <p>{u.blurb}</p>
+                  <span className="badge">מוכן ללמידה</span>
+                </a>
+              ) : (
+                <div key={u.id} className="unit-card soon" aria-disabled>
+                  <div className="u-num">{u.num}</div>
+                  <h3>{u.title}</h3>
+                  <p>{u.blurb}</p>
+                  <span className="badge">בקרוב</span>
+                </div>
+              )
+            )}
+          </div>
+        </section>
+      ))}
       <div className="disclaimer">
         התוכן כאן הוא עיבוד פדגוגי מקורי בעברית של מושגי היסוד בהרמוניה, בהשראת סדר ההוראה בספר
         <span dir="ltr"> Harmony &amp; Voice Leading </span>
