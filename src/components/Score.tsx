@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Accidental, Barline, Beam, Dot, Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
+import { Accidental, BarNote, Barline, Beam, Dot, Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
 import { playNote } from "../engine/audio";
 
 export type ScoreNote = {
@@ -12,12 +12,14 @@ export type ScoreNote = {
   degree?: string;           // scale-degree number drawn with a caret above
   mark?: string;             // plain marking above (P, N, ½ …)
   sub?: string;              // Hebrew label below
+  bar?: boolean;             // entry is a barline, not a note (keys/midi ignored)
 };
 
 type Props = {
   notes: ScoreNote[];
   clef?: "treble" | "bass";
   keySig?: string;           // VexFlow key signature, e.g. "F", "Bb", "Am"
+  timeSig?: string;          // VexFlow time signature, e.g. "3/4", "6/8"
   accidentalKey?: string;    // key context for automatic accidentals (default keySig or "C")
   width?: number;
   clickable?: boolean;
@@ -52,6 +54,7 @@ export function Score({
   notes,
   clef = "treble",
   keySig,
+  timeSig,
   accidentalKey,
   width,
   clickable = true,
@@ -79,6 +82,7 @@ export function Score({
     const stave = new Stave(4, 32, w - 10);
     stave.addClef(clef);
     if (keySig) stave.addKeySignature(keySig);
+    if (timeSig) stave.addTimeSignature(timeSig);
     // these staves are diagrams, not measures — no enclosing barlines
     stave.setBegBarType(Barline.type.NONE);
     stave.setEndBarType(Barline.type.NONE);
@@ -96,6 +100,7 @@ export function Score({
     }
 
     const vexNotes = notes.map((n) => {
+      if (n.bar) return new BarNote();
       const sn = new StaveNote({ keys: n.keys, duration: n.duration ?? "w", clef });
       if (n.dots) Dot.buildAndAttach([sn], { all: true });
       return sn;
@@ -115,12 +120,12 @@ export function Score({
       groupId = undefined;
     };
     notes.forEach((n, i) => {
-      if (n.beam && n.beam === groupId) group.push(vexNotes[i]);
+      if (n.beam && n.beam === groupId) group.push(vexNotes[i] as StaveNote);
       else {
         flushBeam();
         if (n.beam) {
           groupId = n.beam;
-          group = [vexNotes[i]];
+          group = [vexNotes[i] as StaveNote];
         }
       }
     });
@@ -222,7 +227,7 @@ export function Score({
         svg.appendChild(t);
       }
     });
-  }, [notes, clef, keySig, accidentalKey, width, clickable, ariaLabel, themeVersion]);
+  }, [notes, clef, keySig, timeSig, accidentalKey, width, clickable, ariaLabel, themeVersion]);
 
   // playback highlight (group-level fill/stroke override, restoring the kind colour)
   useEffect(() => {
