@@ -197,5 +197,13 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit18/Unit18").then((m) => ({ default: m.Unit18 }))),
   },
-  { id: "19", num: 19, part: 4, title: "פיגורציה ריתמית", blurb: "השהיות בארבעה קולות, אנטיציפציה ונקודת פדל — כשהמקצב עצמו מקשט.", ready: false },
+  {
+    id: "19",
+    num: 19,
+    part: 4,
+    title: "פיגורציה ריתמית",
+    blurb: "השהיה על שלושת שלביה, ‏4–3/7–6/9–8, אנטיציפציה ונקודת פדל — קישוט בזמן.",
+    ready: true,
+    component: lazy(() => import("./unit19/Unit19").then((m) => ({ default: m.Unit19 }))),
+  },
 ];
