@@ -156,7 +156,15 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit14/Unit14").then((m) => ({ default: m.Unit14 }))),
   },
-  { id: "15", num: 15, part: 3, title: "סקוונצות דיאטוניות", blurb: "תבנית שנודדת לאורך הסולם: קווינטות יורדות, ‏5–6 עולה וטרצות יורדות.", ready: false },
+  {
+    id: "15",
+    num: 15,
+    part: 3,
+    title: "סקוונצות דיאטוניות",
+    blurb: "מודל שנודד לאורך הסולם: מעגל הקווינטות המלא, תבנית 5–6, והרישיון שהתבנית מעניקה.",
+    ready: true,
+    component: lazy(() => import("./unit15/Unit15").then((m) => ({ default: m.Unit15 }))),
+  },
   { id: "16", num: 16, part: 3, title: "טכניקות 6/3", blurb: "שרשראות של סקסט־אקורדים מקבילים, והקול שמונע מהן להתנגש.", ready: false },
   { id: "17", num: 17, part: 3, title: "טכניקות 6/4", blurb: "שאר בני המשפחה: ‏6/4 עובר, שכן ומפורק — והכללים שמכשירים אותם.", ready: false },
 ];
