@@ -165,6 +165,20 @@ export function SatbScores({
         });
       }
     });
+
+    // fit the SVG to the engraved notes: low bass notes (ledger lines below
+    // the lower stave) used to get clipped by the fixed height. Note bounding
+    // boxes are used rather than svg.getBBox(), whose font em-boxes overshoot.
+    const lowerStaffBottom = lower.getYForLine(4);
+    const noteBottom = Math.max(
+      lowerStaffBottom,
+      ...lowerNotes.map((vn) => {
+        const bb = vn.getBoundingBox();
+        return bb ? bb.getY() + bb.getH() : lowerStaffBottom;
+      })
+    );
+    const fitH = Math.max(h, Math.ceil(noteBottom) + 10);
+    if (fitH > h) renderer.resize(w, fitH);
   }, [chords, marks, width, label, accidentalKey, themeVersion]);
 
   // playback highlight: gold on the active chord's notes in both staves
