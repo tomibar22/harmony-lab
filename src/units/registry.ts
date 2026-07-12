@@ -229,5 +229,13 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit21/Unit21").then((m) => ({ default: m.Unit21 }))),
   },
-  { id: "22", num: 22, part: 5, title: "מיקסטורה", blurb: "צבעים שאולים מהמינור המקביל — ורגעי ההצללה הגדולים של המז'ור.", ready: false },
+  {
+    id: "22",
+    num: 22,
+    part: 5,
+    title: "מיקסטורה: צבעים מהמקביל",
+    blurb: "‏iv, ‏♭VI ו־II° המושאלים, לה♭ שנמסה אל סול, הנמנעת שנפתחת לעולם אחר — וטרצת פיקרדי.",
+    ready: true,
+    component: lazy(() => import("./unit22/Unit22").then((m) => ({ default: m.Unit22 }))),
+  },
 ];
