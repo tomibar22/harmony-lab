@@ -252,4 +252,13 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit23/Unit23").then((m) => ({ default: m.Unit23 }))),
   },
+  {
+    id: "24",
+    num: 24,
+    part: 6,
+    title: "הסקונדה הפריגית: הנפוליטני",
+    blurb: "משולש מז'ורי על ♭2: הסקסטה הנפוליטנית, הטרצה המוקטנת, הדרכים אליו וממנו - וכללי הכתיב הכרומטי.",
+    ready: true,
+    component: lazy(() => import("./unit24/Unit24").then((m) => ({ default: m.Unit24 }))),
+  },
 ];
