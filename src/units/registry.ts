@@ -220,6 +220,14 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit20/Unit20").then((m) => ({ default: m.Unit20 }))),
   },
-  { id: "21", num: 21, part: 5, title: "מודולציה: V כאזור טונאלי", blurb: "כשהטוניקיזציה מתארכת והופכת מעבר של ממש — הדרך אל סולם הדומיננטה וחזרה.", ready: false },
+  {
+    id: "21",
+    num: 21,
+    part: 5,
+    title: "מודולציה: V כאזור טונאלי",
+    blurb: "אקורד הציר, האות הכרומטי והקדנצה המאשרת: המסע אל סולם הדומיננטה — והשיבה בפה♮ אחד.",
+    ready: true,
+    component: lazy(() => import("./unit21/Unit21").then((m) => ({ default: m.Unit21 }))),
+  },
   { id: "22", num: 22, part: 5, title: "מיקסטורה", blurb: "צבעים שאולים מהמינור המקביל — ורגעי ההצללה הגדולים של המז'ור.", ready: false },
 ];
