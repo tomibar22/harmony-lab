@@ -7,9 +7,9 @@
   --ink: #232b36;
   --ink-soft: #5d6a77;
   --line: #d6cbb6;
-  --accent: #963c42;        /* בורדו — צלילים פעילים, הדגשות */
+  --accent: #963c42;        /* בורדו - צלילים פעילים, הדגשות */
   --accent-soft: #963c421f;
-  --stable: #2e7466;        /* ירוק-כחלחל — צלילים יציבים */
+  --stable: #2e7466;        /* ירוק-כחלחל - צלילים יציבים */
   --stable-soft: #2e74661f;
   --gold: #b98a2f;          /* הדגשת נגינה, התקדמות */
   --gold-soft: #b98a2f2b;
@@ -76,7 +76,7 @@ body {
   font-size: 1.02rem;
   transition: background 0.35s, color 0.35s;
 }
-/* Secular One ships a single 400 weight — never fake-bold it */
+/* Secular One ships a single 400 weight - never fake-bold it */
 h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; line-height: 1.3; }
 button { font-family: var(--font-body); }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
@@ -233,7 +233,7 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
    the caret floats above it without affecting the line box */
 .deg {
   display: inline-block; position: relative; margin: 0 0.08em;
-  font-variant-numeric: tabular-nums; font-weight: 700;
+  font-variant-numeric: tabular-nums; font-weight: 600;
 }
 .deg .caret {
   position: absolute; top: -0.34em; inset-inline-start: 50%;
@@ -247,8 +247,8 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
    centered on the text line so the stack doesn't sag below the baseline */
 .fig {
   display: inline-flex; flex-direction: column; align-items: center;
-  line-height: 1.02; font-size: 0.68em; font-weight: 700;
-  vertical-align: middle; transform: translateY(-0.08em); margin: 0 0.18em;
+  line-height: 1.05; font-size: 0.76em; font-weight: 600;
+  vertical-align: middle; transform: translateY(-0.08em); margin: 0 0.07em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -258,9 +258,15 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
 
 /* term / glossary */
 .term {
-  border-bottom: 2px dotted var(--gold); cursor: help; font-weight: 600;
-  position: relative;
+  cursor: help; position: relative;
 }
+.term .term-he { border-bottom: 2px dotted var(--gold); font-weight: 600; }
+.term .term-en {
+  font-size: 0.8em; font-weight: 500; color: var(--ink-soft);
+  margin-inline-start: 0.32em; unicode-bidi: isolate;
+}
+.term .term-en::before { content: "("; }
+.term .term-en::after { content: ")"; }
 .term .tip {
   position: absolute; bottom: calc(100% + 8px); inset-inline-start: 50%;
   transform: translateX(50%) translateY(4px);
@@ -335,9 +341,10 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
   border: 1px dashed var(--line); border-radius: var(--radius); color: var(--ink-soft);
 }
 .next-unit .next-link {
-  display: inline-block; margin-top: 1rem; padding: 0.55rem 1.3rem;
-  background: var(--ink); color: var(--bg); border-radius: 999px;
-  font-weight: 700; text-decoration: none; transition: transform .15s, opacity .15s;
+  display: inline-block; margin-top: 1rem; padding: 0.6rem 1.4rem;
+  background: var(--accent); color: var(--paper); border-radius: 999px;
+  font-weight: 700; text-decoration: none; box-shadow: var(--shadow);
+  transition: transform .15s, opacity .15s, box-shadow .15s;
 }
-.next-unit .next-link:hover { transform: translateY(-1px); opacity: 0.9; }
+.next-unit .next-link:hover { transform: translateY(-1px); opacity: 0.95; box-shadow: var(--shadow-lift); }
 footer.site { text-align: center; color: var(--ink-soft); font-size: 0.8rem; padding: 2rem 1rem 3rem; border-top: 1px solid var(--line); }

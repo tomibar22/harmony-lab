@@ -67,7 +67,7 @@ export function PlayButton({
   player,
   ghost,
 }: {
-  label: string;
+  label: ReactNode;
   events: SeqEvent[];
   bpm?: number;
   player: Player;
@@ -157,15 +157,13 @@ export function Callout({ label, children, insight }: { label: string; children:
   );
 }
 
-/* ---------- glossary term with hover definition ---------- */
+/* ---------- glossary term: Hebrew + inline English gloss, hover for the definition ---------- */
 export function Term({ he, en, def }: { he: string; en: string; def: string }) {
   return (
     <span className="term" tabIndex={0}>
-      {he}
-      <span className="tip" role="tooltip">
-        {def}
-        <span className="en">{en}</span>
-      </span>
+      <span className="term-he">{he}</span>
+      <span className="term-en" dir="ltr">{en}</span>
+      <span className="tip" role="tooltip">{def}</span>
     </span>
   );
 }

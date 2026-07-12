@@ -88,7 +88,7 @@ export function Score({
     stave.addClef(clef);
     if (keySig) stave.addKeySignature(keySig);
     if (timeSig) stave.addTimeSignature(timeSig);
-    // these staves are diagrams, not measures — no enclosing barlines
+    // these staves are diagrams, not measures - no enclosing barlines
     stave.setBegBarType(Barline.type.NONE);
     stave.setEndBarType(Barline.type.NONE);
     stave.setContext(context).draw();
@@ -183,7 +183,7 @@ export function Score({
           el.style.stroke = colorOf(n.kind);
         }
         if (clickable && n.midi.length) {
-          // the svg root ships with pointer-events="none" — re-enable on the note group
+          // the svg root ships with pointer-events="none" - re-enable on the note group
           el.style.pointerEvents = "auto";
           el.classList.add("clickable-note");
           el.addEventListener("click", () => void playNote(n.midi));
@@ -194,7 +194,7 @@ export function Score({
 
     // labels drawn inside the SVG so responsive scaling keeps alignment.
     // Degrees and marks sit just above the staff (or the highest notehead),
-    // not at a fixed height — a fixed y left them floating far above the staff.
+    // not at a fixed height - a fixed y left them floating far above the staff.
     const staffTop = stave.getYForLine(0);
     const staffBottom = stave.getYForLine(4);
     const boxes = vexNotes.map((vn) => vn.getBoundingBox());
@@ -213,15 +213,15 @@ export function Score({
         t.setAttribute("x", String(x));
         t.setAttribute("y", String(y));
         t.setAttribute("text-anchor", "middle");
-        t.setAttribute("font-size", "14");
-        t.setAttribute("font-weight", "700");
+        t.setAttribute("font-size", "16.5");
+        t.setAttribute("font-weight", "600");
         t.setAttribute("font-family", NOTE_FONT);
         t.setAttribute("fill", colorOf(n.kind));
         t.textContent = n.degree;
         svg.appendChild(t);
-        // caret drawn as a path above the number — never a combining character
+        // caret drawn as a path above the number - never a combining character
         const c = document.createElementNS(NS, "path");
-        c.setAttribute("d", `M ${x - 4} ${y - 12} L ${x} ${y - 17} L ${x + 4} ${y - 12}`);
+        c.setAttribute("d", `M ${x - 4.5} ${y - 13} L ${x} ${y - 18.5} L ${x + 4.5} ${y - 13}`);
         c.setAttribute("stroke", colorOf(n.kind));
         c.setAttribute("stroke-width", "1.6");
         c.setAttribute("fill", "none");
@@ -229,13 +229,18 @@ export function Score({
         svg.appendChild(c);
       }
       if (n.mark) {
+        // Harmonic labels (roman numerals) align in a row above the staff;
+        // figuration marks (P, N, AP…) hug their own note so they don't float
+        // high above a mid-staff notehead.
+        const isRoman = /^[IVXivx]/.test(n.mark);
+        const markBase = isRoman ? labelY : Math.max(16, noteTops[i] - 6);
         // "V65"-style marks engrave as roman numeral + stacked figure
         const rm = /^([IVXivx]+)(\d)(\d)$/.exec(n.mark);
         const roman = document.createElementNS(NS, "text");
         roman.setAttribute("x", String(rm ? x - 2 : x));
-        roman.setAttribute("y", String(labelY - 2));
+        roman.setAttribute("y", String(markBase - 2));
         roman.setAttribute("text-anchor", rm ? "end" : "middle");
-        roman.setAttribute("font-size", "13");
+        roman.setAttribute("font-size", "14.5");
         roman.setAttribute("font-style", "italic");
         roman.setAttribute("font-weight", "600");
         roman.setAttribute("font-family", NOTE_FONT);
@@ -246,10 +251,10 @@ export function Score({
           [rm[2], rm[3]].forEach((d, row) => {
             const t = document.createElementNS(NS, "text");
             t.setAttribute("x", String(x - 1));
-            t.setAttribute("y", String(labelY - 10 + row * 8));
+            t.setAttribute("y", String(markBase - 11 + row * 9.5));
             t.setAttribute("text-anchor", "start");
-            t.setAttribute("font-size", "8.5");
-            t.setAttribute("font-weight", "700");
+            t.setAttribute("font-size", "10.5");
+            t.setAttribute("font-weight", "600");
             t.setAttribute("font-family", NOTE_FONT);
             t.setAttribute("fill", colorOf(n.kind));
             t.textContent = d;
@@ -263,10 +268,10 @@ export function Score({
           const t = document.createElementNS(NS, "text");
           t.setAttribute("x", String(x));
           // single figures sit on the lower row, where the "3" of 5/3 would be
-          t.setAttribute("y", String(figY + (digits.length === 1 ? 14 : row * 14)));
+          t.setAttribute("y", String(figY + (digits.length === 1 ? 15 : row * 15)));
           t.setAttribute("text-anchor", "middle");
-          t.setAttribute("font-size", "13.5");
-          t.setAttribute("font-weight", "600");
+          t.setAttribute("font-size", "15.5");
+          t.setAttribute("font-weight", "500");
           t.setAttribute("font-family", NOTE_FONT);
           t.setAttribute("fill", cssVar("--ink"));
           t.textContent = d;

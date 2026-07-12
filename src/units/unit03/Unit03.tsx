@@ -18,6 +18,7 @@ function clicks(accents: readonly number[], bars: number, startAt = 0): SeqEvent
         time: startAt + b * accents.length + i,
         dur: 0.15,
         vel: a >= 1 ? 0.95 : a > 0 ? 0.6 : 0.35,
+        perc: true, // metronome click - rhythm, not pitch
       });
     });
   }
@@ -38,11 +39,11 @@ const TEMPO_TERMS = [
 /* ---------------- note values ---------------- */
 
 const NOTE_VALUES: ScoreNote[] = [
-  { keys: ["g/4"], duration: "w", midi: [67], sub: "שלם — 4 פעמות" },
-  { keys: ["g/4"], duration: "h", midi: [67], sub: "חצי — 2" },
-  { keys: ["g/4"], duration: "q", midi: [67], sub: "רבע — 1" },
-  { keys: ["g/4"], duration: "8", midi: [67], sub: "שמינית — ½" },
-  { keys: ["g/4"], duration: "16", midi: [67], sub: "שש־עשרית — ¼" },
+  { keys: ["g/4"], duration: "w", midi: [67], sub: "שלם - 4 פעמות" },
+  { keys: ["g/4"], duration: "h", midi: [67], sub: "חצי - 2" },
+  { keys: ["g/4"], duration: "q", midi: [67], sub: "רבע - 1" },
+  { keys: ["g/4"], duration: "8", midi: [67], sub: "שמינית - ½" },
+  { keys: ["g/4"], duration: "16", midi: [67], sub: "שש־עשרית - ¼" },
 ];
 
 const VALUE_LADDER_SEQ: SeqEvent[] = [
@@ -69,7 +70,7 @@ const METERS = [
   { he: "מרובע", sig: "4/4", accents: [1, 0, 0.6, 0] },
 ] as const;
 
-/** God Save the King (traditional) — first phrase, 3/4. */
+/** God Save the King (traditional) - first phrase, 3/4. */
 const ANTHEM_NOTES: ScoreNote[] = [
   { keys: ["g/4"], duration: "q", midi: [67], mark: ">" },
   { keys: ["g/4"], duration: "q", midi: [67] },
@@ -112,7 +113,7 @@ const ANTHEM_SEQ: SeqEvent[] = [
   { midi: 67, time: 15, dur: 3, idx: 20, vel: 0.95 },
 ];
 
-/* six identical eighths — grouped 3+3 (6/8) or 2+2+2 (3/4) */
+/* six identical eighths - grouped 3+3 (6/8) or 2+2+2 (3/4) */
 const eighthsWith = (beams: string[], accented: number[]): ScoreNote[] =>
   beams.map((b, i) => ({
     keys: ["g/4"],
@@ -130,9 +131,10 @@ const groupSeq = (accented: number[]): SeqEvent[] =>
     dur: 0.9,
     idx: i % 6,
     vel: accented.includes(i % 6) ? 0.95 : 0.45,
+    perc: true, // pure rhythmic grouping (6/8 vs 3/4) - non-pitched clicks
   }));
 
-/** Mozart, Piano Sonata K. 331, i — bars 1–2 (melody), 6/8. */
+/** Mozart, Piano Sonata K. 331, i - bars 1–2 (melody), 6/8. */
 const MOZART_331: ScoreNote[] = [
   { keys: ["c#/5"], duration: "8", dots: 1, midi: [73], beam: "m1" },
   { keys: ["d/5"], duration: "16", midi: [74], beam: "m1" },
@@ -193,7 +195,7 @@ const SYNC_SEQ: SeqEvent[] = [
 /* ---------------- anacrusis (original example) ---------------- */
 
 const ANACRUSIS_NOTES: ScoreNote[] = [
-  { keys: ["g/4"], duration: "q", midi: [67], sub: "אנאקרוזה" },
+  { keys: ["g/4"], duration: "q", midi: [67], sub: "קדמה" },
   { keys: [], midi: [], bar: true },
   { keys: ["c/5"], duration: "h", midi: [72], mark: ">" },
   { keys: ["e/5"], duration: "q", midi: [76] },
@@ -257,7 +259,7 @@ function timeSigQuestion(): Question {
     .slice(0, 3)
     .map((s) => s.sig);
   return {
-    prompt: <>{q.desc} — מהו סימן המשקל?</>,
+    prompt: <>{q.desc} - מהו סימן המשקל?</>,
     options: shuffle([q.sig, ...wrong]),
     answer: q.sig,
     explain: (
@@ -293,7 +295,7 @@ function classifyMeterQuestion(): Question {
     ),
     options: shuffle([q.cls, ...wrong]),
     answer: q.cls,
-    explain: <>פשוט — הפעמה מתחלקת לשניים; מורכב — לשלושה. זוגי/משולש/מרובע לפי מספר הפעמות בתיבה.</>,
+    explain: <>פשוט - הפעמה מתחלקת לשניים; מורכב - לשלושה. זוגי/משולש/מרובע לפי מספר הפעמות בתיבה.</>,
   };
 }
 
@@ -332,16 +334,16 @@ export function Unit03() {
         <div className="unit-label">יחידה 3</div>
         <h1>מקצב ומשקל</h1>
         <p className="lede">
-          עד עכשיו עסקנו בגובה — אילו צלילים. היחידה הזאת עוסקת בזמן: איך משכים, פעמות והטעמות מארגנים את
-          הזרימה — ולמה השאלה "מתי" חשובה להרמוניה לא פחות מהשאלה "מה".
+          עד עכשיו עסקנו בגובה - אילו צלילים. היחידה הזאת עוסקת בזמן: איך משכים, פעמות והטעמות מארגנים את
+          הזרימה - ולמה השאלה "מתי" חשובה להרמוניה לא פחות מהשאלה "מה".
         </p>
       </header>
 
       <Section id="beat" num="3.1" title="פעמה וטמפו">
         <p>
-          מתחת לכל מוזיקה כמעט פועם דופק סמוי וסדיר — ה<Term he="פעמה" en="Beat" def="יחידת הזמן הבסיסית: הדופק הסדיר שעליו נמדדים כל המשכים. זה מה שהרגל מקישה כשמקשיבים." />.
+          מתחת לכל מוזיקה כמעט פועם דופק סמוי וסדיר - ה<Term he="פעמה" en="Beat" def="יחידת הזמן הבסיסית: הדופק הסדיר שעליו נמדדים כל המשכים. זה מה שהרגל מקישה כשמקשיבים." />.
           זו היחידה שבה אנחנו מודדים כל משך, ומה שהרגל מקישה מעצמה בהאזנה. מהירות הפעמה נקראת{" "}
-          <Term he="טמפו" en="Tempo" def="מהירות הפעמה, הנמדדת בפעימות לדקה (BPM) או מצוינת במונחים איטלקיים מסורתיים." /> —
+          <Term he="טמפו" en="Tempo" def="מהירות הפעמה, הנמדדת בפעימות לדקה (BPM) או מצוינת במונחים איטלקיים מסורתיים." /> -
           נהוג למדוד אותה בפעימות לדקה (<span dir="ltr">BPM</span>) או לציין אותה במונחים האיטלקיים
           המסורתיים:
         </p>
@@ -366,7 +368,7 @@ export function Unit03() {
           }
         >
           <p style={{ direction: "rtl", margin: 0 }}>
-            <b>{tempo.he}</b> <span style={{ color: "var(--ink-soft)" }} dir="ltr">({tempo.en})</span> —{" "}
+            <b>{tempo.he}</b> <span style={{ color: "var(--ink-soft)" }} dir="ltr">({tempo.en})</span> -{" "}
             {tempo.desc}, בסביבות <span dir="ltr">{tempo.bpm} BPM</span>.
           </p>
         </Widget>
@@ -375,18 +377,18 @@ export function Unit03() {
       <Section id="values" num="3.2" title="ערכי המשך: הכול יחסי">
         <p>
           התווים אינם מציינים משך מוחלט בשניות אלא <em className="hl">יחס</em>: כל ערך שווה לשני הערכים
-          מהדרגה שמתחתיו. תו שלם = שני חצאים = ארבעה רבעים = שמונה שמיניות — והטמפו הוא שקובע כמה זמן
+          מהדרגה שמתחתיו. תו שלם = שני חצאים = ארבעה רבעים = שמונה שמיניות - והטמפו הוא שקובע כמה זמן
           זה בפועל:
         </p>
         <Widget
-          title="סולם הערכים — כל תו מתחלק לשניים (מעל דופק קבוע)"
+          title="סולם הערכים - כל תו מתחלק לשניים (מעל דופק קבוע)"
           foot={<PlayButton label="נגנו את הסולם, מהשלם לשש־עשרית" events={VALUE_LADDER_SEQ} bpm={112} player={valuePlayer} />}
         >
           <Score notes={NOTE_VALUES} even width={620} highlightIndex={valuePlayer.index} ariaLabel="תו שלם, חצי, רבע, שמינית ושש־עשרית" />
         </Widget>
         <p>
           שני כלים מרחיבים את המערכת: <b>נקודה</b> אחרי תו מוסיפה לו חצי מערכו (רבע מנוקד = רבע + שמינית),
-          ו<b>קשת הַחְזָקָה</b> מחברת שני תווים לצליל אחד רציף — כך רושמים משכים שחוצים קו תיבה.
+          ו<b>קשת הַחְזָקָה</b> מחברת שני תווים לצליל אחד רציף - כך רושמים משכים שחוצים קו תיבה.
         </p>
         <Widget
           title="התו המנוקד ומשלימו"
@@ -404,13 +406,13 @@ export function Unit03() {
       <Section id="meter" num="3.3" title="משקל: הפעמות מתארגנות בקבוצות">
         <p>
           פעמות אינן נשארות שורה אחידה: האוזן מקבצת אותן לקבוצות קבועות של שתיים, שלוש או ארבע, שבראש כל
-          אחת פעמה <b>חזקה</b>. הארגון הזה הוא ה<Term he="משקל" en="Meter" def="ארגון הפעמות בקבוצות קבועות של חזקות וחלשות. הפעמה הראשונה בכל קבוצה — הדאונביט — היא החזקה." />,
+          אחת פעמה <b>חזקה</b>. הארגון הזה הוא ה<Term he="משקל" en="Meter" def="ארגון הפעמות בקבוצות קבועות של חזקות וחלשות. הפעמה הראשונה בכל קבוצה - הדאונביט - היא החזקה." />,
           כל קבוצה נרשמת כ<Term he="תיבה" en="Measure / Bar" def="קבוצת פעמות אחת של המשקל, התחומה בקווי תיבה אנכיים על החמשה." /> בין
-          שני קווים אנכיים, וה<Term he="סימן המשקל" en="Time signature" def="שני המספרים שבתחילת היצירה: העליון — כמה יחידות בתיבה; התחתון — מהי היחידה (4 = רבע, 8 = שמינית)." /> שבתחילת
-          היצירה מכריז על הארגון: המספר העליון — כמה, התחתון — ממה (4 = רבעים, 8 = שמיניות).
+          שני קווים אנכיים, וה<Term he="סימן המשקל" en="Time signature" def="שני המספרים שבתחילת היצירה: העליון - כמה יחידות בתיבה; התחתון - מהי היחידה (4 = רבע, 8 = שמינית)." /> שבתחילת
+          היצירה מכריז על הארגון: המספר העליון - כמה, התחתון - ממה (4 = רבעים, 8 = שמיניות).
         </p>
         <Widget
-          title="שלושת המשקלים הפשוטים — הקשיבו להטעמה"
+          title="שלושת המשקלים הפשוטים - הקשיבו להטעמה"
           foot={
             <>
               <div className="tabs" role="tablist" style={{ direction: "rtl" }}>
@@ -446,18 +448,18 @@ export function Unit03() {
         </Widget>
         <Callout label="למה זה חשוב להרמוניה?" insight>
           המשקל הוא לא עניין "טכני": הוא קובע היכן האוזן מצפה ליציבות. ביחידות הבאות נראה שאותו דיסוננס
-          בדיוק נשמע אחרת כשהוא נופל על פעמה חזקה — והטיפול בו תלוי בדיוק במיקומו בתיבה.
+          בדיוק נשמע אחרת כשהוא נופל על פעמה חזקה - והטיפול בו תלוי בדיוק במיקומו בתיבה.
         </Callout>
       </Section>
 
       <Section id="triple" num="3.4" title="משקל משולש בפעולה">
         <p>
-          הלחן המסורתי הזה — מוכר כהמנון "אלוהים נצור את המלך" — הוא שיעור מושלם במשקל משולש: כל תיבה
+          הלחן המסורתי הזה - מוכר כהמנון "אלוהים נצור את המלך" - הוא שיעור מושלם במשקל משולש: כל תיבה
           נשענת על הפעמה הראשונה שלה, והתבנית "רבע מנוקד–שמינית–רבע" בתיבות 2 ו־4 מדגישה את הדאונביט
           עוד יותר. עקבו אחרי סימני ה־<span dir="ltr">&gt;</span>:
         </p>
         <Widget
-          title="לחן מסורתי — משקל 3/4, הפעמות החזקות מסומנות"
+          title="לחן מסורתי - משקל 3/4, הפעמות החזקות מסומנות"
           foot={<PlayButton label="נגנו את הפסוק" events={ANTHEM_SEQ} bpm={92} player={anthemPlayer} />}
         >
           <Score
@@ -473,18 +475,18 @@ export function Unit03() {
 
       <Section id="compound" num="3.5" title="פשוט ומורכב: איך מתחלקת הפעמה?">
         <p>
-          עד כאן חילקנו כל פעמה לשניים — זה <Term he="משקל פשוט" en="Simple meter" def="משקל שבו הפעמה מתחלקת באופן טבעי לשתי יחידות (רבע לשתי שמיניות)." />. אבל
+          עד כאן חילקנו כל פעמה לשניים - זה <Term he="משקל פשוט" en="Simple meter" def="משקל שבו הפעמה מתחלקת באופן טבעי לשתי יחידות (רבע לשתי שמיניות)." />. אבל
           פעמה יכולה להתחלק גם לשלושה: אז הפעמה היא תו מנוקד, והמשקל{" "}
-          <Term he="משקל מורכב" en="Compound meter" def="משקל שבו הפעמה היא תו מנוקד המתחלק לשלוש יחידות. סימנו העליון 6, 9 או 12 — סופרים את יחידות המשנה." />.
-          ההבדל אינו במספר השמיניות אלא ב<em className="hl">קיבוץ</em> שלהן — הקשיבו לאותן שש שמיניות
+          <Term he="משקל מורכב" en="Compound meter" def="משקל שבו הפעמה היא תו מנוקד המתחלק לשלוש יחידות. סימנו העליון 6, 9 או 12 - סופרים את יחידות המשנה." />.
+          ההבדל אינו במספר השמיניות אלא ב<em className="hl">קיבוץ</em> שלהן - הקשיבו לאותן שש שמיניות
           בדיוק, פעם כ־3+3 ופעם כ־2+2+2:
         </p>
         <Widget
-          title="שש שמיניות, שני משקלים — הקורות חושפות את הקיבוץ"
+          title="שש שמיניות, שני משקלים - הקורות חושפות את הקיבוץ"
           foot={
             <>
-              <PlayButton label="‏6/8 — שתי פעמות מנוקדות" events={groupSeq([0, 3])} bpm={176} player={groupPlayer} />
-              <PlayButton label="‏3/4 — שלוש פעמות פשוטות" ghost events={groupSeq([0, 2, 4])} bpm={176} player={groupPlayer} />
+              <PlayButton label="‏6/8 - שתי פעמות מנוקדות" events={groupSeq([0, 3])} bpm={176} player={groupPlayer} />
+              <PlayButton label="‏3/4 - שלוש פעמות פשוטות" ghost events={groupSeq([0, 2, 4])} bpm={176} player={groupPlayer} />
             </>
           }
         >
@@ -494,11 +496,11 @@ export function Unit03() {
           </div>
         </Widget>
         <p>
-          המשקל המורכב הנפוץ ביותר הוא <span dir="ltr">6/8</span>, וכך הוא נשמע אצל מוצרט — פתיחת הסונטה
+          המשקל המורכב הנפוץ ביותר הוא <span dir="ltr">6/8</span>, וכך הוא נשמע אצל מוצרט - פתיחת הסונטה
           ק. 331, שבה כל תיבה מתנדנדת על שתי פעמות מנוקדות:
         </p>
         <Widget
-          title="מוצרט, סונטה לפסנתר ק. 331, פרק א׳ — תיבות 1–2"
+          title="מוצרט, סונטה לפסנתר ק. 331, פרק א׳ - תיבות 1–2"
           foot={<PlayButton label="נגנו את הפתיחה" events={MOZART_331_SEQ} bpm={126} player={mozartPlayer} />}
         >
           <Score
@@ -513,13 +515,13 @@ export function Unit03() {
 
       <Section id="syncopation" num="3.6" title="סינקופה: הטעמה נגד המשקל">
         <p>
-          המשקל יוצר רשת של ציפיות — ובדיוק בגלל זה אפשר לשחק נגדה.{" "}
-          <Term he="סינקופה" en="Syncopation" def="הדגשת צלילים דווקא בין הפעמות או על החלשות, בניגוד לרשת המשקל. המתח נוצר מול הציפייה — ולכן הדופק חייב להישאר יציב." /> מטעימה
+          המשקל יוצר רשת של ציפיות - ובדיוק בגלל זה אפשר לשחק נגדה.{" "}
+          <Term he="סינקופה" en="Syncopation" def="הדגשת צלילים דווקא בין הפעמות או על החלשות, בניגוד לרשת המשקל. המתח נוצר מול הציפייה - ולכן הדופק חייב להישאר יציב." /> מטעימה
           צלילים דווקא <em className="hl">בין</em> הפעמות: שמינית אחת מזיזה את כל השאר, וכל המשפט נשען
-          על "אוויר". השוו — אותם צלילים, מעל אותו דופק:
+          על "אוויר". השוו - אותם צלילים, מעל אותו דופק:
         </p>
         <Widget
-          title="ישר מול מסונקפ — הדופק זהה, ההטעמה זזה"
+          title="ישר מול מסונקפ - הדופק זהה, ההטעמה זזה"
           foot={
             <>
               <PlayButton label="על הפעמות" events={STRAIGHT_SEQ} bpm={96} player={syncPlayer} />
@@ -533,23 +535,23 @@ export function Unit03() {
           </div>
         </Widget>
         <Callout label="שימו לב">
-          סינקופה אינה "יציאה מהקצב" — להפך: היא עובדת רק כשהפעמה יציבה לגמרי. המתח נוצר מהפער בין
+          סינקופה אינה "יציאה מהקצב" - להפך: היא עובדת רק כשהפעמה יציבה לגמרי. המתח נוצר מהפער בין
           מה שנשמע ובין הרשת שהאוזן ממשיכה לספור מתחת.
         </Callout>
       </Section>
 
-      <Section id="anacrusis" num="3.7" title="אנאקרוזה: להתחיל לפני ההתחלה">
+      <Section id="anacrusis" num="3.7" title="קדמה: להתחיל לפני ההתחלה">
         <p>
           לא כל מנגינה מתחילה על פעמה חזקה. פתיחה על פעמה חלשה שמובילה אל הדאונביט הקרוב נקראת{" "}
-          <Term he="אנאקרוזה" en="Anacrusis / Upbeat" def="צליל פתיחה (או כמה) על פעמה חלשה, לפני התיבה השלמה הראשונה. משלים בדרך כלל את התיבה האחרונה." /> —
+          <Term he="קדמה" en="Anacrusis / Upbeat" def="צליל פתיחה (או כמה) על פעמה חלשה, לפני התיבה השלמה הראשונה. משלים בדרך כלל את התיבה האחרונה." /> -
           "קפיצת מדרגה" קטנה שנותנת למשפט תנופה. שימו לב איך הצליל הבודד שלפני הקו נשען קדימה, אל
           הפעמה החזקה הראשונה:
         </p>
         <Widget
-          title="פתיחה באנאקרוזה — הצליל שלפני קו התיבה מוביל פנימה"
+          title="פתיחה בקדמה - הצליל שלפני קו התיבה מוביל פנימה"
           foot={<PlayButton label="נגנו את המשפט" events={ANACRUSIS_SEQ} bpm={92} player={anaPlayer} />}
         >
-          <Score notes={ANACRUSIS_NOTES} timeSig="4/4" highlightIndex={anaPlayer.index} ariaLabel="משפט הנפתח באנאקרוזה של רבע" />
+          <Score notes={ANACRUSIS_NOTES} timeSig="4/4" highlightIndex={anaPlayer.index} ariaLabel="משפט הנפתח בקדמה של רבע" />
         </Widget>
       </Section>
 
@@ -558,15 +560,15 @@ export function Unit03() {
           <div className="review-chip"><b>פעמה וטמפו</b>הדופק הסדיר; מהירותו נמדדת ב־BPM או במונחים איטלקיים.</div>
           <div className="review-chip"><b>ערכי משך</b>יחסיים: כל ערך = שניים מהדרגה שמתחת; נקודה מוסיפה חצי.</div>
           <div className="review-chip"><b>משקל</b>קיבוץ פעמות לחזקות וחלשות; נרשם בתיבות.</div>
-          <div className="review-chip"><b>סימן המשקל</b>עליון — כמה; תחתון — ממה (4 = רבע, 8 = שמינית).</div>
+          <div className="review-chip"><b>סימן המשקל</b>עליון - כמה; תחתון - ממה (4 = רבע, 8 = שמינית).</div>
           <div className="review-chip"><b>פשוט / מורכב</b>הפעמה מתחלקת לשניים / לשלושה (פעמה מנוקדת).</div>
-          <div className="review-chip"><b>6/8 מול 3/4</b>אותן שש שמיניות — קיבוץ שונה: 3+3 מול 2+2+2.</div>
+          <div className="review-chip"><b>6/8 מול 3/4</b>אותן שש שמיניות - קיבוץ שונה: 3+3 מול 2+2+2.</div>
           <div className="review-chip"><b>סינקופה</b>הטעמה בין הפעמות או על החלשות, מעל דופק יציב.</div>
-          <div className="review-chip"><b>אנאקרוזה</b>פתיחה על פעמה חלשה המובילה אל הדאונביט.</div>
+          <div className="review-chip"><b>קדמה</b>פתיחה על פעמה חלשה המובילה אל הדאונביט.</div>
         </div>
       </Section>
 
-      <Section id="drills" num="3.9" title="תרגול — עד שזה אוטומטי">
+      <Section id="drills" num="3.9" title="תרגול - עד שזה אוטומטי">
         <Drill title="חשבון ערכי המשך" generate={valueMathQuestion} />
         <Drill title="זיהוי סימן המשקל" generate={timeSigQuestion} />
         <Drill title="פשוט או מורכב?" generate={classifyMeterQuestion} />
@@ -574,8 +576,8 @@ export function Unit03() {
       </Section>
 
       <NextUnit current={3}>
-        <b>הבא בתור — יחידה 4: משולשים וספטאקורדים.</b> מהמרווחים אל האקורדים: איך בונים משולש, מה מבדיל
-        מז'ורי ממינורי וממוקטן, ומהם ההיפוכים — אבני הבניין של כל ההרמוניה שנלמד מכאן והלאה.
+        <b>הבא בתור - יחידה 4: משולשים וספטאקורדים.</b> מהמרווחים אל האקורדים: איך בונים משולש, מה מבדיל
+        מז'ורי ממינורי וממוקטן, ומהם ההיפוכים - אבני הבניין של כל ההרמוניה שנלמד מכאן והלאה.
       </NextUnit>
     </div>
   );

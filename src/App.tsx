@@ -49,7 +49,7 @@ function Toc() {
       sections.forEach((s) => io!.observe(s));
     };
     scan();
-    // the unit is lazy-loaded, and hash navigation can swap units under us —
+    // the unit is lazy-loaded, and hash navigation can swap units under us -
     // rescan whenever the lesson DOM actually changes (signature-guarded)
     const mo = new MutationObserver(scan);
     mo.observe(document.body, { childList: true, subtree: true });
@@ -82,10 +82,10 @@ function Home() {
   return (
     <div className="home">
       <div className="kicker">מעבדת הרמוניה · לימוד הרמוניה קלאסית בעברית</div>
-      <h1>הספר שמנגן בחזרה</h1>
+      <h1>שיעורי הרמוניה והולכת קולות</h1>
       <p className="lede">
         מסע אינטראקטיבי בהרמוניה טונאלית ובהובלת קולות, יחידה אחר יחידה, בעקבות המהלך הפדגוגי של
-        אלדוול ושכטר — בעיבוד עברי מקורי שבו כל דוגמה נשמעת וכל מושג נבדק.
+        אלדוול ושכטר - בעיבוד עברי מקורי שבו כל דוגמה נשמעת וכל מושג נבדק.
       </p>
       {PARTS.map((part) => (
         <section key={part.num} className="home-part">

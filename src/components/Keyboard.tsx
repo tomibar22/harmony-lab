@@ -24,7 +24,9 @@ function whiteKeysBetween(from: number, to: number): number[] {
 export function Keyboard({ fromMidi = 60, toMidi = 72, highlight = {}, labels = {}, brackets = [], ariaLabel }: Props) {
   const whites = whiteKeysBetween(fromMidi, toMidi);
   const hasBrackets = brackets.length > 0;
-  const height = KH + 22 + (hasBrackets ? 34 : 0);
+  // each bracket sits on its own row so overlapping spans never collide
+  const BRACKET_ROW = 30;
+  const height = KH + 22 + (hasBrackets ? brackets.length * BRACKET_ROW : 0);
   const width = whites.length * KW + 2;
 
   const xOfWhite = (midi: number) => whites.indexOf(midi) * KW + 1;
@@ -108,11 +110,11 @@ export function Keyboard({ fromMidi = 60, toMidi = 72, highlight = {}, labels = 
         {brackets.map((b, i) => {
           const x1 = xOfWhite(b.fromMidi) + (KW - 2) / 2;
           const x2 = xOfWhite(b.toMidi) + (KW - 2) / 2;
-          const y = KH + 12;
+          const y = KH + 12 + i * BRACKET_ROW;
           return (
             <g key={i}>
               <path d={`M ${x1} ${y} v 6 H ${x2} v -6`} stroke="var(--accent)" strokeWidth={2} fill="none" />
-              <text x={(x1 + x2) / 2} y={y + 24} textAnchor="middle" fontSize={12} fontWeight={700} fill="var(--accent)">
+              <text x={(x1 + x2) / 2} y={y + 19} textAnchor="middle" fontSize={11.5} fontWeight={600} fill="var(--accent)">
                 {b.label}
               </text>
             </g>
