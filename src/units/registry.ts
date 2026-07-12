@@ -32,6 +32,11 @@ export const PARTS: { num: number; title: string; desc: string }[] = [
     title: "חלק רביעי · פיגורציה",
     desc: "איך שלד הרמוני הופך למוזיקה חיה: צלילי קישוט, מקצב, השהיות ופדל.",
   },
+  {
+    num: 5,
+    title: "חלק חמישי · כרומטיקה ראשונה",
+    desc: "חוצים את גבול הסולם: צלילים מושאלים, דומיננטות משניות, מודולציה ומיקסטורה.",
+  },
 ];
 
 export const UNITS: UnitMeta[] = [
@@ -206,4 +211,15 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit19/Unit19").then((m) => ({ default: m.Unit19 }))),
   },
+  {
+    id: "20",
+    num: 20,
+    part: 5,
+    title: "דומיננטות משניות וטוניקיזציה",
+    blurb: "לשאול צליל מוביל: חצי טון אחד הופך כל אקורד לדומיננטה של שכנו — V/V, ‏V/IV ומשפחתם.",
+    ready: true,
+    component: lazy(() => import("./unit20/Unit20").then((m) => ({ default: m.Unit20 }))),
+  },
+  { id: "21", num: 21, part: 5, title: "מודולציה: V כאזור טונאלי", blurb: "כשהטוניקיזציה מתארכת והופכת מעבר של ממש — הדרך אל סולם הדומיננטה וחזרה.", ready: false },
+  { id: "22", num: 22, part: 5, title: "מיקסטורה", blurb: "צבעים שאולים מהמינור המקביל — ורגעי ההצללה הגדולים של המז'ור.", ready: false },
 ];
