@@ -37,6 +37,11 @@ export const PARTS: { num: number; title: string; desc: string }[] = [
     title: "חלק חמישי · כרומטיקה ראשונה",
     desc: "חוצים את גבול הסולם: צלילים מושאלים, דומיננטות משניות, מודולציה ומיקסטורה.",
   },
+  {
+    num: 6,
+    title: "חלק שישי · דיסוננס וכרומטיקה שנייה",
+    desc: "קומה נוספת של עושר: נונות מעל הדומיננטה, הנפוליטני, אקורדי הסקסטה המוגדלת.",
+  },
 ];
 
 export const UNITS: UnitMeta[] = [
@@ -237,5 +242,14 @@ export const UNITS: UnitMeta[] = [
     blurb: "‏iv, ‏♭VI ו־II° המושאלים, לה♭ שנמסה אל סול, הנמנעת שנפתחת לעולם אחר - וטרצת פיקרדי.",
     ready: true,
     component: lazy(() => import("./unit22/Unit22").then((m) => ({ default: m.Unit22 }))),
+  },
+  {
+    id: "23",
+    num: 23,
+    part: 6,
+    title: "ספטאקורדים עם דיסוננס נוסף",
+    blurb: "נונות מעל V7: שכן והשהיה, ‏♭9 מן המיקסטורה, הקשר ל־vii°7, סקוונצות - ו«אקורדי 11 ו־13».",
+    ready: true,
+    component: lazy(() => import("./unit23/Unit23").then((m) => ({ default: m.Unit23 }))),
   },
 ];
