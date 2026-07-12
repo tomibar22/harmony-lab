@@ -27,6 +27,11 @@ export const PARTS: { num: number; title: string; desc: string }[] = [
     title: "חלק שלישי · טכניקות 5/3, ‏6/3 ו־6/4",
     desc: "מעבר לתחביר: איך אקורדים במצביהם השונים בונים קווים, סקוונצות ומרקמים.",
   },
+  {
+    num: 4,
+    title: "חלק רביעי · פיגורציה",
+    desc: "איך שלד הרמוני הופך למוזיקה חיה: צלילי קישוט, מקצב, השהיות ופדל.",
+  },
 ];
 
 export const UNITS: UnitMeta[] = [
@@ -183,4 +188,14 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit17/Unit17").then((m) => ({ default: m.Unit17 }))),
   },
+  {
+    id: "18",
+    num: 18,
+    part: 4,
+    title: "פיגורציה מלודית",
+    blurb: "צלילי הקישוט: מעבר, שכן, דילוג, אפוג'טורה וצליל בורח — משלד חשוף למלודיה חיה.",
+    ready: true,
+    component: lazy(() => import("./unit18/Unit18").then((m) => ({ default: m.Unit18 }))),
+  },
+  { id: "19", num: 19, part: 4, title: "פיגורציה ריתמית", blurb: "השהיות בארבעה קולות, אנטיציפציה ונקודת פדל — כשהמקצב עצמו מקשט.", ready: false },
 ];
