@@ -165,6 +165,14 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit15/Unit15").then((m) => ({ default: m.Unit15 }))),
   },
-  { id: "16", num: 16, part: 3, title: "טכניקות 6/3", blurb: "שרשראות של סקסט־אקורדים מקבילים, והקול שמונע מהן להתנגש.", ready: false },
+  {
+    id: "16",
+    num: 16,
+    part: 3,
+    title: "טכניקות 6/3: שרשראות מקבילות",
+    blurb: "המקבילות המותרות: פובורדון, שרשרת סקסט־אקורדים בארבעה קולות, והזיגזג של הקול הרביעי.",
+    ready: true,
+    component: lazy(() => import("./unit16/Unit16").then((m) => ({ default: m.Unit16 }))),
+  },
   { id: "17", num: 17, part: 3, title: "טכניקות 6/4", blurb: "שאר בני המשפחה: ‏6/4 עובר, שכן ומפורק — והכללים שמכשירים אותם.", ready: false },
 ];
