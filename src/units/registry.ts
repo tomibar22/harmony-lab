@@ -174,5 +174,13 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit16/Unit16").then((m) => ({ default: m.Unit16 }))),
   },
-  { id: "17", num: 17, part: 3, title: "טכניקות 6/4", blurb: "שאר בני המשפחה: ‏6/4 עובר, שכן ומפורק — והכללים שמכשירים אותם.", ready: false },
+  {
+    id: "17",
+    num: 17,
+    part: 3,
+    title: "טכניקות 6/4: שאר בני המשפחה",
+    blurb: "‏6/4 עובר, שכן ומפורק — ארבעה הקשרים לאקורד אחד, והמפגש עם הקדנציאלי.",
+    ready: true,
+    component: lazy(() => import("./unit17/Unit17").then((m) => ({ default: m.Unit17 }))),
+  },
 ];
