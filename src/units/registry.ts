@@ -22,6 +22,11 @@ export const PARTS: { num: number; title: string; desc: string }[] = [
     title: "חלק שני · I–V–I והרחבותיו",
     desc: "לב הדקדוק הטונאלי: ציר הטוניקה–דומיננטה, והאקורדים שמרחיבים ומעשירים אותו.",
   },
+  {
+    num: 3,
+    title: "חלק שלישי · טכניקות 5/3, ‏6/3 ו־6/4",
+    desc: "מעבר לתחביר: איך אקורדים במצביהם השונים בונים קווים, סקוונצות ומרקמים.",
+  },
 ];
 
 export const UNITS: UnitMeta[] = [
@@ -142,4 +147,16 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit13/Unit13").then((m) => ({ default: m.Unit13 }))),
   },
+  {
+    id: "14",
+    num: 14,
+    part: 3,
+    title: "טכניקות 5/3: ‏III ותנועות היסודות",
+    blurb: "קווינטה, טרצה וסקונדה בין יסודות; המשולש האחרון של הסולם ותפקידו — במז'ור ובמינור.",
+    ready: true,
+    component: lazy(() => import("./unit14/Unit14").then((m) => ({ default: m.Unit14 }))),
+  },
+  { id: "15", num: 15, part: 3, title: "סקוונצות דיאטוניות", blurb: "תבנית שנודדת לאורך הסולם: קווינטות יורדות, ‏5–6 עולה וטרצות יורדות.", ready: false },
+  { id: "16", num: 16, part: 3, title: "טכניקות 6/3", blurb: "שרשראות של סקסט־אקורדים מקבילים, והקול שמונע מהן להתנגש.", ready: false },
+  { id: "17", num: 17, part: 3, title: "טכניקות 6/4", blurb: "שאר בני המשפחה: ‏6/4 עובר, שכן ומפורק — והכללים שמכשירים אותם.", ready: false },
 ];
