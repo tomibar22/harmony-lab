@@ -1,6 +1,6 @@
 import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
-import { Callout, Deg, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
+import { Callout, Deg, FigText, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
 import { NextUnit } from "../../components/NextUnit";
 import { Satb, SatbScores, chordSeq } from "../../components/Satb";
 import { SeqEvent } from "../../engine/audio";
@@ -183,7 +183,7 @@ export function Unit14() {
     <div className="lesson">
       <header className="lesson-hero">
         <div className="unit-label">יחידה 14 · חלק שלישי</div>
-        <h1>טכניקות 5/3: ‏III ותנועות היסודות</h1>
+        <h1><FigText text="טכניקות 5/3: ‏III ותנועות היסודות" /></h1>
         <p className="lede">
           החלק השני לימד אותנו תחביר: מה בא לפני מה. החלק השלישי שואל שאלה אחרת — <em className="hl">איך
           דברים נעים</em>. נפתח במצב היסודי: שלוש דרכים שבהן יסוד הולך אל יסוד, והמשולש האחרון שטרם
