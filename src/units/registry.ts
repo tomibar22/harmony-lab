@@ -261,4 +261,13 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit24/Unit24").then((m) => ({ default: m.Unit24 }))),
   },
+  {
+    id: "25",
+    num: 25,
+    part: 6,
+    title: "אקורדי הסקסטה המוגדלת",
+    blurb: "‏♭6 בבס, ‏♯4 מעליה - צבת שנסגרת על הדומיננטה: האיטלקית, הגרמנית והצרפתית, בס הקינה, והתאומות האנהרמוניות.",
+    ready: true,
+    component: lazy(() => import("./unit25/Unit25").then((m) => ({ default: m.Unit25 }))),
+  },
 ];
