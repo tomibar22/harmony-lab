@@ -279,4 +279,13 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit26/Unit26").then((m) => ({ default: m.Unit26 }))),
   },
+  {
+    id: "27",
+    num: 27,
+    part: 6,
+    title: "טכניקות הובלת קולות כרומטיות",
+    blurb: "כרומטיקה כדרך תנועה: מקבילים מז'וריים, מוקטנים עוקבים, החלפת קולות 6–10, חלוקות שוות של האוקטבה - והסולם האוקטטוני.",
+    ready: true,
+    component: lazy(() => import("./unit27/Unit27").then((m) => ({ default: m.Unit27 }))),
+  },
 ];
