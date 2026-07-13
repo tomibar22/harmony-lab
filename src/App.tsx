@@ -89,8 +89,8 @@ function Home() {
       </p>
       {PARTS.map((part) => (
         <section key={part.num} className="home-part">
-          <h2 className="part-title">{part.title}</h2>
-          <p className="part-desc">{part.desc}</p>
+          <h2 className="part-title"><FigText text={part.title} /></h2>
+          <p className="part-desc"><FigText text={part.desc} /></p>
           <div className="units-grid">
             {UNITS.filter((u) => u.part === part.num).map((u) =>
               u.ready ? (

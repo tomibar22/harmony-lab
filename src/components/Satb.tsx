@@ -74,43 +74,68 @@ export function SatbScores({
 
     const w = width ?? Math.max(300, 90 + chords.length * 58);
     const upperY = 38;
-    const lowerY = 112; // brought close: a grand-staff gap, not two separate systems
-    const h = 172;
+    // staves start at x=16 so the brace (drawn to their left) isn't clipped
+    const engrave = (lowerY: number) => {
+      host.innerHTML = "";
+      const renderer = new Renderer(host, Renderer.Backends.SVG);
+      renderer.resize(w, lowerY + 90);
+      const context = renderer.getContext();
 
-    const renderer = new Renderer(host, Renderer.Backends.SVG);
-    renderer.resize(w, h);
-    const context = renderer.getContext();
+      const upper = new Stave(16, upperY, w - 22);
+      upper.addClef("treble");
+      const lower = new Stave(16, lowerY, w - 22);
+      lower.addClef("bass");
+      upper.setContext(context).draw();
+      lower.setContext(context).draw();
 
-    const upper = new Stave(4, upperY, w - 10);
-    upper.addClef("treble");
-    const lower = new Stave(4, lowerY, w - 10);
-    lower.addClef("bass");
-    upper.setContext(context).draw();
-    lower.setContext(context).draw();
+      // brace + single left line join the two staves into one instrument
+      new StaveConnector(upper, lower).setType(StaveConnector.type.BRACE).setContext(context).draw();
+      new StaveConnector(upper, lower).setType(StaveConnector.type.SINGLE_LEFT).setContext(context).draw();
 
-    // brace + single left line join the two staves into one instrument
-    new StaveConnector(upper, lower).setType(StaveConnector.type.BRACE).setContext(context).draw();
-    new StaveConnector(upper, lower).setType(StaveConnector.type.SINGLE_LEFT).setContext(context).draw();
+      const upperNotes = chords.map(
+        (c) => new StaveNote({ keys: [c.a[0], c.s[0]], duration: "w", clef: "treble" })
+      );
+      const lowerNotes = chords.map(
+        (c) => new StaveNote({ keys: [c.b[0], c.t[0]], duration: "w", clef: "bass" })
+      );
 
-    const upperNotes = chords.map(
-      (c) => new StaveNote({ keys: [c.a[0], c.s[0]], duration: "w", clef: "treble" })
-    );
-    const lowerNotes = chords.map(
-      (c) => new StaveNote({ keys: [c.b[0], c.t[0]], duration: "w", clef: "bass" })
-    );
+      const key = accidentalKey ?? "C";
+      const upperVoice = new Voice({ numBeats: 4, beatValue: 4 }).setMode(Voice.Mode.SOFT);
+      upperVoice.addTickables(upperNotes);
+      const lowerVoice = new Voice({ numBeats: 4, beatValue: 4 }).setMode(Voice.Mode.SOFT);
+      lowerVoice.addTickables(lowerNotes);
+      Accidental.applyAccidentals([upperVoice], key);
+      Accidental.applyAccidentals([lowerVoice], key);
 
-    const key = accidentalKey ?? "C";
-    const upperVoice = new Voice({ numBeats: 4, beatValue: 4 }).setMode(Voice.Mode.SOFT);
-    upperVoice.addTickables(upperNotes);
-    const lowerVoice = new Voice({ numBeats: 4, beatValue: 4 }).setMode(Voice.Mode.SOFT);
-    lowerVoice.addTickables(lowerNotes);
-    Accidental.applyAccidentals([upperVoice], key);
-    Accidental.applyAccidentals([lowerVoice], key);
+      // one formatter over both voices → identical x-positions, aligned chords
+      new Formatter().joinVoices([upperVoice]).joinVoices([lowerVoice]).format([upperVoice, lowerVoice], w - 100);
+      upperVoice.draw(context, upper);
+      lowerVoice.draw(context, lower);
+      return { renderer, upper, lower, upperNotes, lowerNotes };
+    };
 
-    // one formatter over both voices → identical x-positions, aligned chords
-    new Formatter().joinVoices([upperVoice]).joinVoices([lowerVoice]).format([upperVoice, lowerVoice], w - 90);
-    upperVoice.draw(context, upper);
-    lowerVoice.draw(context, lower);
+    // first pass at the default grand-staff gap; if low treble notes and high
+    // bass notes would collide between the staves, push the lower stave down
+    let lowerY = 112;
+    let engraved = engrave(lowerY);
+    {
+      const bbBottom = (vn: StaveNote) => {
+        const bb = vn.getBoundingBox();
+        return bb ? bb.getY() + bb.getH() : -Infinity;
+      };
+      const bbTop = (vn: StaveNote) => {
+        const bb = vn.getBoundingBox();
+        return bb ? bb.getY() : Infinity;
+      };
+      const upperBottom = Math.max(engraved.upper.getYForLine(4), ...engraved.upperNotes.map(bbBottom));
+      const lowerTop = Math.min(engraved.lower.getYForLine(0), ...engraved.lowerNotes.map(bbTop));
+      const overlap = upperBottom + 10 - lowerTop;
+      if (overlap > 0) {
+        lowerY += Math.ceil(overlap);
+        engraved = engrave(lowerY);
+      }
+    }
+    const { renderer, upper, lower, upperNotes, lowerNotes } = engraved;
 
     const svg = host.querySelector("svg")!;
     svg.setAttribute("role", "img");
@@ -118,6 +143,10 @@ export function SatbScores({
     const notation = cssVar("--notation") || "#2a333e";
     svg.setAttribute("fill", notation);
     svg.setAttribute("stroke", notation);
+    // ledger lines ship with a hard-coded stroke="#444" that ignores the
+    // theme - strip it so they inherit the notation colour
+    svg.querySelectorAll('[stroke="#444"]').forEach((el) => el.removeAttribute("stroke"));
+    svg.querySelectorAll('[fill="#444"]').forEach((el) => el.removeAttribute("fill"));
 
     const bind = (vn: StaveNote, midi: number[]) => {
       const el = elOf(vn);
@@ -138,7 +167,7 @@ export function SatbScores({
       const m = marks?.[i];
       if (!m) return;
       const x = vn.getAbsoluteX() + 6;
-      const rm = /^([IVXivx]+)(\d)(\d)$/.exec(m);
+      const rm = /^([IVXivx]+|It|Ger|Fr)(\d)(\d)$/.exec(m);
       const roman = document.createElementNS(NS, "text");
       roman.setAttribute("x", String(rm ? x - 2 : x));
       roman.setAttribute("y", String(labelY - 2));
@@ -166,19 +195,33 @@ export function SatbScores({
       }
     });
 
-    // fit the SVG to the engraved notes: low bass notes (ledger lines below
-    // the lower stave) used to get clipped by the fixed height. Note bounding
-    // boxes are used rather than svg.getBBox(), whose font em-boxes overshoot.
-    const lowerStaffBottom = lower.getYForLine(4);
-    const noteBottom = Math.max(
-      lowerStaffBottom,
-      ...lowerNotes.map((vn) => {
+    // fit the SVG to the engraved content: trim dead space above the system
+    // and make room for low bass notes below it. Note bounding boxes are used
+    // rather than svg.getBBox(), whose font em-boxes overshoot.
+    const hasMarks = !!marks?.some(Boolean);
+    const upperStaffTop = upper.getYForLine(0);
+    const noteTop = Math.min(
+      upperStaffTop - 14,
+      hasMarks ? labelY - 20 : Infinity,
+      ...upperNotes.map((vn) => {
         const bb = vn.getBoundingBox();
-        return bb ? bb.getY() + bb.getH() : lowerStaffBottom;
+        return bb ? bb.getY() - 4 : Infinity;
       })
     );
-    const fitH = Math.max(h, Math.ceil(noteBottom) + 10);
-    if (fitH > h) renderer.resize(w, fitH);
+    const lowerStaffBottom = lower.getYForLine(4);
+    const noteBottom = Math.max(
+      lowerStaffBottom + 14,
+      ...lowerNotes.map((vn) => {
+        const bb = vn.getBoundingBox();
+        return bb ? bb.getY() + bb.getH() + 4 : lowerStaffBottom;
+      })
+    );
+    const top = Math.floor(noteTop);
+    const bottom = Math.ceil(noteBottom);
+    renderer.resize(w, bottom - top);
+    svg.setAttribute("viewBox", `0 ${top} ${w} ${bottom - top}`);
+    svg.setAttribute("width", String(w));
+    svg.setAttribute("height", String(bottom - top));
   }, [chords, marks, width, label, accidentalKey, themeVersion]);
 
   // playback highlight: gold on the active chord's notes in both staves

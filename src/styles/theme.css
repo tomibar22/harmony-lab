@@ -263,7 +263,7 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
 .term .term-he { border-bottom: 2px dotted var(--gold); font-weight: 600; }
 .term .term-en {
   font-size: 0.8em; font-weight: 500; color: var(--ink-soft);
-  margin-inline-start: 0.32em; unicode-bidi: isolate;
+  margin-inline: 0.32em; unicode-bidi: isolate;
 }
 .term .term-en::before { content: "("; }
 .term .term-en::after { content: ")"; }

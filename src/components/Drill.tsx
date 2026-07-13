@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useState } from "react";
-import { FigText } from "./ui";
+import { FigText, bidi } from "./ui";
 
 /** Options are plain strings, or value/label pairs when the label needs markup
  *  (e.g. stacked figured-bass numbers). Answers always compare by value. */
@@ -61,7 +61,7 @@ export function Drill({ title, generate }: Props) {
           )}
         </div>
       </div>
-      <div className="d-prompt">{q.prompt}</div>
+      <div className="d-prompt">{bidi(q.prompt)}</div>
       <div className="d-options">
         {q.options.map((opt) => {
           const val = valueOf(opt);
@@ -80,11 +80,11 @@ export function Drill({ title, generate }: Props) {
       <div className="d-feedback" aria-live="polite">
         {chosen &&
           (chosen === q.answer ? (
-            <span style={{ color: "var(--stable)", fontWeight: 700 }}>נכון! {q.explain}</span>
+            <span style={{ color: "var(--stable)", fontWeight: 700 }}>נכון! {bidi(q.explain)}</span>
           ) : (
             <span>
               <span style={{ color: "var(--accent)", fontWeight: 700 }}>התשובה: {q.answerLabel ?? <FigText text={q.answer} />}. </span>
-              {q.explain}
+              {bidi(q.explain)}
             </span>
           ))}
       </div>

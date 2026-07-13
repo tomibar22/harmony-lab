@@ -386,7 +386,7 @@ export function Unit24() {
             />
           }
         >
-          <Score notes={POSITIONS} width={320} highlightIndex={posPlayer.index} accidentalKey="Am" ariaLabel="שלושת מצבי הנפוליטני" />
+          <Score notes={POSITIONS} width={420} highlightIndex={posPlayer.index} accidentalKey="Am" ariaLabel="שלושת מצבי הנפוליטני" />
         </Widget>
         <p>
           ובמז'ור? ביתו האמיתי של ♭II הוא המינור. במז'ור נדרשים <em className="hl">שני</em> שינויים

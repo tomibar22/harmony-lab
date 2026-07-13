@@ -9,8 +9,8 @@ import { Satb, SatbScores, chordSeq } from "../../components/Satb";
    home key for the unit: A minor. bass F (b6), upper D# (#4), both lean into E. */
 
 const INTERVAL: ScoreNote[] = [
-  { keys: ["f/3", "d#/4"], midi: [53, 63], sub: "סקסטה מוגדלת", kind: "active" },
-  { keys: ["e/3", "e/4"], midi: [52, 64], sub: "אוקטבה על 5", kind: "stable" },
+  { keys: ["f/4", "d#/5"], midi: [65, 75], sub: "סקסטה מוגדלת", kind: "active" },
+  { keys: ["e/4", "e/5"], midi: [64, 76], sub: "אוקטבה על 5", kind: "stable" },
 ];
 
 /* ---------------- contrapuntal origin: the Phrygian cadence, sharpened ---------------- */

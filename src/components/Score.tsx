@@ -192,6 +192,12 @@ export function Score({
       return el;
     });
 
+    // ledger lines (and a few other primitives) ship with a hard-coded
+    // stroke="#444" that ignores the theme - strip it so they inherit the
+    // notation colour like everything else
+    svg.querySelectorAll('[stroke="#444"]').forEach((el) => el.removeAttribute("stroke"));
+    svg.querySelectorAll('[fill="#444"]').forEach((el) => el.removeAttribute("fill"));
+
     // labels drawn inside the SVG so responsive scaling keeps alignment.
     // Degrees and marks sit just above the staff (or the highest notehead),
     // not at a fixed height - a fixed y left them floating far above the staff.
@@ -204,6 +210,11 @@ export function Score({
     // figured-bass digits stack right under the staff (or the lowest notehead)
     const figY = Math.max(staffBottom, ...noteBottoms) + 16;
     const NS = "http://www.w3.org/2000/svg";
+    // content extent tracking so the SVG can be trimmed to what was engraved -
+    // the fixed canvas left a large blank band above and below the staff
+    let extTop = Math.min(staffTop - 14, ...noteTops.map((y) => y - 4));
+    let extBottom = Math.max(staffBottom + 14, ...noteBottoms.map((y) => y + 4));
+    const subEntries: { x: number; text: string }[] = [];
     vexNotes.forEach((vn, i) => {
       const n = notes[i];
       const x = vn.getAbsoluteX() + 6;
@@ -227,15 +238,16 @@ export function Score({
         c.setAttribute("fill", "none");
         c.setAttribute("stroke-linecap", "round");
         svg.appendChild(c);
+        extTop = Math.min(extTop, y - 24);
       }
       if (n.mark) {
         // Harmonic labels (roman numerals) align in a row above the staff;
         // figuration marks (P, N, AP…) hug their own note so they don't float
         // high above a mid-staff notehead.
-        const isRoman = /^[IVXivx]/.test(n.mark);
+        const isRoman = /^([IVXivx♭♯]|It|Ger|Fr)/.test(n.mark);
         const markBase = isRoman ? labelY : Math.max(16, noteTops[i] - 6);
         // "V65"-style marks engrave as roman numeral + stacked figure
-        const rm = /^([IVXivx]+)(\d)(\d)$/.exec(n.mark);
+        const rm = /^([IVXivx]+|It|Ger|Fr)(\d)(\d)$/.exec(n.mark);
         const roman = document.createElementNS(NS, "text");
         roman.setAttribute("x", String(rm ? x - 2 : x));
         roman.setAttribute("y", String(markBase - 2));
@@ -247,6 +259,7 @@ export function Score({
         roman.setAttribute("fill", colorOf(n.kind));
         roman.textContent = rm ? rm[1] : n.mark;
         svg.appendChild(roman);
+        extTop = Math.min(extTop, markBase - 18);
         if (rm) {
           [rm[2], rm[3]].forEach((d, row) => {
             const t = document.createElementNS(NS, "text");
@@ -276,20 +289,45 @@ export function Score({
           t.setAttribute("fill", cssVar("--ink"));
           t.textContent = d;
           svg.appendChild(t);
+          extBottom = Math.max(extBottom, figY + (digits.length === 1 ? 15 : row * 15) + 5);
         });
       }
-      if (n.sub) {
-        const t = document.createElementNS(NS, "text");
-        t.setAttribute("x", String(x));
-        t.setAttribute("y", String(h - 10));
-        t.setAttribute("text-anchor", "middle");
-        t.setAttribute("font-size", "12");
-        t.setAttribute("font-family", NOTE_FONT);
-        t.setAttribute("fill", cssVar("--ink-soft"));
-        t.textContent = n.sub;
-        svg.appendChild(t);
-      }
+      if (n.sub) subEntries.push({ x, text: n.sub });
     });
+
+    // sub labels flow below everything else; when neighbours would overlap,
+    // alternate them onto a second row instead of letting them collide
+    if (subEntries.length) {
+      const subBase = extBottom + 12;
+      const rowEnds = [-Infinity, -Infinity];
+      let usedSecondRow = false;
+      [...subEntries]
+        .sort((a, b) => a.x - b.x)
+        .forEach(({ x, text }) => {
+          const t = document.createElementNS(NS, "text");
+          t.setAttribute("x", String(x));
+          t.setAttribute("text-anchor", "middle");
+          t.setAttribute("font-size", "12");
+          t.setAttribute("font-family", NOTE_FONT);
+          t.setAttribute("fill", cssVar("--ink-soft"));
+          t.textContent = text;
+          svg.appendChild(t);
+          const half = t.getComputedTextLength() / 2;
+          const row = x - half > rowEnds[0] + 8 ? 0 : 1;
+          if (row === 1) usedSecondRow = true;
+          t.setAttribute("y", String(subBase + row * 15));
+          rowEnds[row] = x + half;
+        });
+      extBottom = subBase + (usedSecondRow ? 15 : 0) + 4;
+    }
+
+    // trim the canvas to the engraved content - no dead space above or below
+    const top = Math.floor(extTop);
+    const bottom = Math.ceil(extBottom);
+    renderer.resize(w, bottom - top);
+    svg.setAttribute("viewBox", `0 ${top} ${w} ${bottom - top}`);
+    svg.setAttribute("width", String(w));
+    svg.setAttribute("height", String(bottom - top));
   }, [notes, clef, keySig, timeSig, even, accidentalKey, width, clickable, ariaLabel, themeVersion]);
 
   // playback highlight (group-level fill/stroke override, restoring the kind colour)
