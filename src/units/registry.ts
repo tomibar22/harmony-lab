@@ -270,4 +270,13 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit25/Unit25").then((m) => ({ default: m.Unit25 }))),
   },
+  {
+    id: "26",
+    num: 26,
+    part: 6,
+    title: "אקורדים כרומטיים אחרים",
+    blurb: "מיקסטורה בשלוש דרגות עומק, המשולש המוגדל, ‏V7♯5 ו־V7♭5 - ואקורדי הצליל המשותף שמקשטים בלי להוביל.",
+    ready: true,
+    component: lazy(() => import("./unit26/Unit26").then((m) => ({ default: m.Unit26 }))),
+  },
 ];
