@@ -50,7 +50,18 @@ export function Rn({ n }: { n: string }) {
 const MUSIC_TOKEN =
   /(?<![A-Za-z])([♭♯]?)(It|Ger|Fr|[IVX]+|[ivx]+)(°|ø)?(?:(\d)\/?(\d)|(\d))?([♭♯]\d)?(?![A-Za-z])|(?<![\d/])(\d)\/(\d)(?![\d/])|[♭♯]\d/g;
 
-export function FigText({ text }: { text: string }) {
+/* a progression/degree chain: tokens joined by dashes ("I–IV6–V–I", "5–6",
+   "T–S–D–T"). The whole chain must be one LTR unit - isolating only the
+   individual tokens leaves the chain itself reading right-to-left. */
+const CHAIN_TOKEN =
+  "(?:[♭♯]?(?:It|Ger|Fr|[IVX]+|[ivx]+)(?:°|ø)?(?:\\d\\/?\\d|\\d)?(?:[♭♯]\\d)?|[♭♯]\\d|\\d{1,2}(?:\\/\\d)?|[TSD])";
+const MUSIC_CHAIN = new RegExp(
+  `(?<![A-Za-z\\d])${CHAIN_TOKEN}(?:[–—-]${CHAIN_TOKEN})+(?![A-Za-z\\d])`,
+  "g"
+);
+
+/** single-token pass: isolate each music token and stack its figures */
+function renderMusicRuns(text: string, prefix: string): ReactNode[] {
   const parts: ReactNode[] = [];
   let last = 0;
   let k = 0;
@@ -59,7 +70,7 @@ export function FigText({ text }: { text: string }) {
     k += 1;
     if (m[2]) {
       parts.push(
-        <span key={k} className="rn" dir="ltr">
+        <span key={`${prefix}${k}`} className="rn" dir="ltr">
           {m[1]}
           {m[2]}
           {m[3]}
@@ -68,18 +79,35 @@ export function FigText({ text }: { text: string }) {
         </span>
       );
     } else if (m[8]) {
-      parts.push(<Fig key={k} n={`${m[8]}/${m[9]}`} />);
+      parts.push(<Fig key={`${prefix}${k}`} n={`${m[8]}/${m[9]}`} />);
     } else {
       parts.push(
-        <span key={k} dir="ltr">
+        <span key={`${prefix}${k}`} dir="ltr">
           {m[0]}
         </span>
       );
     }
     last = m.index! + m[0].length;
   }
-  if (parts.length === 0) return <>{text}</>;
   if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
+export function FigText({ text }: { text: string }) {
+  const parts: ReactNode[] = [];
+  let last = 0;
+  let k = 0;
+  for (const m of text.matchAll(MUSIC_CHAIN)) {
+    if (m.index! > last) parts.push(...renderMusicRuns(text.slice(last, m.index), `t${k}-`));
+    k += 1;
+    parts.push(
+      <span key={`chain${k}`} className="rn" dir="ltr">
+        {renderMusicRuns(m[0], `c${k}-`)}
+      </span>
+    );
+    last = m.index! + m[0].length;
+  }
+  if (last < text.length) parts.push(...renderMusicRuns(text.slice(last), `t${k + 1}-`));
   return <>{parts}</>;
 }
 
@@ -94,7 +122,33 @@ export function bidi(node: ReactNode): ReactNode {
     return /[A-Za-z♭♯]|\d\/\d/.test(node) ? <FigText text={node} /> : node;
   }
   if (Array.isArray(node)) {
-    return node.map((n, i) => {
+    // element chains: <Deg/>–<Deg/> (or <Fig/>–<Fig/>) sequences read
+    // right-to-left in RTL flow - group each run into one LTR isolate
+    const isDegFig = (n: ReactNode) =>
+      isValidElement(n) && (n.type === Deg || n.type === Fig || n.type === Rn);
+    const isDash = (n: ReactNode) => typeof n === "string" && /^[–—-]+$/.test(n);
+    const grouped: ReactNode[] = [];
+    for (let i = 0; i < node.length; i++) {
+      if (isDegFig(node[i]) && isDash(node[i + 1]) && isDegFig(node[i + 2])) {
+        const run: ReactNode[] = [node[i]];
+        let j = i + 1;
+        while (isDash(node[j]) && isDegFig(node[j + 1])) {
+          run.push(node[j], node[j + 1]);
+          j += 2;
+        }
+        grouped.push(
+          <span key={`chain-${i}`} className="rn" dir="ltr">
+            {run.map((r, ri) =>
+              isValidElement(r) ? cloneElement(r, { key: r.key ?? `cr-${ri}` }) : r
+            )}
+          </span>
+        );
+        i = j - 1;
+      } else {
+        grouped.push(node[i]);
+      }
+    }
+    return grouped.map((n, i) => {
       const r = bidi(n);
       return isValidElement(r) ? cloneElement(r, { key: r.key ?? `bidi-${i}` }) : r;
     });
