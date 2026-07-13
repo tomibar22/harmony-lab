@@ -288,4 +288,13 @@ export const UNITS: UnitMeta[] = [
     ready: true,
     component: lazy(() => import("./unit27/Unit27").then((m) => ({ default: m.Unit27 }))),
   },
+  {
+    id: "28",
+    num: 28,
+    part: 6,
+    title: "כרומטיקה בהקשרים רחבים",
+    blurb: "חותמת הספר: מודולציות בהטיה כרומטית ובצליל משותף, שערי האנהרמוניה של °7 והגרמנית, אזורים טונאליים כרומטיים - והמוטיב שנהיה מפה.",
+    ready: true,
+    component: lazy(() => import("./unit28/Unit28").then((m) => ({ default: m.Unit28 }))),
+  },
 ];
