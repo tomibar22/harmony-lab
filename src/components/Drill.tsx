@@ -29,7 +29,12 @@ export function Drill({ title, generate }: Props) {
   const [total, setTotal] = useState(0);
   const [streak, setStreak] = useState(0);
 
-  const q = useMemo(() => generate(), [seed, generate]);
+  // options are always re-shuffled here, so pools may list the correct answer
+  // first and no positional pattern ever leaks to the learner
+  const q = useMemo(() => {
+    const gen = generate();
+    return { ...gen, options: shuffle(gen.options) };
+  }, [seed, generate]);
 
   const answer = (opt: string) => {
     if (chosen) return;
