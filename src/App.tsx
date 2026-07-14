@@ -126,7 +126,10 @@ export default function App() {
   const route = useHashRoute();
   const { theme, cycle } = useTheme();
   const unitMatch = route.match(/^#\/unit\/(\d+)/);
-  const unit = unitMatch ? UNITS.find((u) => u.id === unitMatch[1] && u.ready) : undefined;
+  // compare numerically so a typed "#/unit/8" matches the zero-padded id "08"
+  const unit = unitMatch
+    ? UNITS.find((u) => Number(u.id) === Number(unitMatch[1]) && u.ready)
+    : undefined;
   const UnitComp = unit?.component;
 
   useEffect(() => {
