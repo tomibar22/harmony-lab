@@ -3,7 +3,12 @@ import {
   SpelledPitch,
   applyInterval,
   degreePitch,
+  diatonicTriad,
+  figureOf,
   findKey,
+  invertChord,
+  seventhPitches,
+  triadPitches,
   intervalBetween,
   invertIv,
   ivNameHe,
@@ -129,6 +134,42 @@ describe("intervals", () => {
     expect(invertIv(3, "minor")).toEqual({ size: 6, quality: "major" });
     expect(invertIv(4, "aug")).toEqual({ size: 5, quality: "dim" });
     expect(invertIv(8, "perfect")).toEqual({ size: 1, quality: "perfect" });
+  });
+});
+
+describe("chords", () => {
+  it("builds triads of all qualities", () => {
+    expect(names(triadPitches(P(0, 0, 4), "M"))).toBe("C E G");
+    expect(names(triadPitches(P(1, -1, 4), "m"))).toBe("D♭ F♭ A♭");
+    expect(names(triadPitches(P(3, 1, 4), "d"))).toBe("F♯ A C");
+    expect(names(triadPitches(P(2, -1, 4), "A"))).toBe("E♭ G B");
+  });
+
+  it("builds seventh chords of all qualities", () => {
+    expect(names(seventhPitches(P(4, 0, 3), "X7"))).toBe("G B D F");
+    expect(names(seventhPitches(P(3, 0, 4), "M7"))).toBe("F A C E");
+    expect(names(seventhPitches(P(6, 0, 3), "hd7"))).toBe("B D F A");
+    expect(names(seventhPitches(P(0, 1, 4), "d7"))).toBe("C♯ E G B♭");
+  });
+
+  it("stacks inversions in close position from the bass", () => {
+    const cM = triadPitches(P(0, 0, 4), "M");
+    expect(invertChord(cM, 1, 4).map(vexKeyOf)).toEqual(["e/4", "g/4", "c/5"]);
+    expect(invertChord(cM, 2, 3).map(vexKeyOf)).toEqual(["g/3", "c/4", "e/4"]);
+    const g7 = seventhPitches(P(4, 0, 3), "X7");
+    expect(invertChord(g7, 3, 3).map(vexKeyOf)).toEqual(["f/3", "g/3", "b/3", "d/4"]);
+  });
+
+  it("labels figures", () => {
+    expect(figureOf(3, 2)).toBe("6/4");
+    expect(figureOf(4, 1)).toBe("6/5");
+  });
+
+  it("builds diatonic triads in a key", () => {
+    const db = findKey("רה♭", "major");
+    expect(names(diatonicTriad(db, 2, 3))).toBe("E♭ G♭ B♭"); // II of D♭
+    const cs = findKey("דו♯", "minor");
+    expect(names(diatonicTriad(cs, 5, 3, "harmonic"))).toBe("G♯ B♯ D♯"); // V of c♯ harmonic
   });
 });
 

@@ -3,6 +3,7 @@ import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, Deg, Fig, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
 import { NextUnit } from "../../components/NextUnit";
+import { WorkbookCta } from "../../workbook/WorkbookCta";
 import { SeqEvent } from "../../engine/audio";
 
 /* ---------------- triad qualities on C ---------------- */
@@ -491,6 +492,11 @@ export function Unit04() {
         <Drill title="מצבי המשולש" generate={inversionQuestion} />
         <Drill title="ספרורי הספטאקורד" generate={seventhFigureQuestion} />
       </Section>
+
+      <WorkbookCta
+        unitId="04"
+        blurb="שבעה תרגילי אקורדים בסגנון ספר העבודה: בנייה מהיסוד, מהטרצה ומהקווינטה, זיהוי יסוד־איכות־מצב, ספרור, דרגות בסולם — והסולם שמאחורי V7 ו־VII°7."
+      />
 
       <NextUnit current={4}>
         <b>הבא בתור - יחידה 5: מבוא לקונטרפונקט.</b> לפני שנחבר אקורדים בזה אחר זה, נלמד לחבר שני קווים

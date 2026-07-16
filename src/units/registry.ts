@@ -85,6 +85,7 @@ export const UNITS: UnitMeta[] = [
     blurb: "ארבע איכויות, ספרות רומיות, היפוכים ובס ממוספר, וספטאקורד הדומיננטה.",
     ready: true,
     component: lazy(() => import("./unit04/Unit04").then((m) => ({ default: m.Unit04 }))),
+    workbook: lazy(() => import("./unit04/Workbook04").then((m) => ({ default: m.Workbook04 }))),
   },
   {
     id: "05",

@@ -248,3 +248,75 @@ const QUALITY_INV: Record<IvQuality, IvQuality> = {
 export function invertIv(size: number, quality: IvQuality): { size: number; quality: IvQuality } {
   return { size: 9 - size, quality: QUALITY_INV[quality] };
 }
+
+/* ---------------- triads and seventh chords ---------------- */
+
+export type TriadQuality = "M" | "m" | "d" | "A";
+export type SeventhQuality = "M7" | "m7" | "X7" | "hd7" | "d7";
+
+export const TRIAD_QUALITY_HE: Record<TriadQuality, string> = {
+  M: "מז'ורי",
+  m: "מינורי",
+  d: "מוקטן",
+  A: "מוגדל",
+};
+
+export const SEVENTH_QUALITY_HE: Record<SeventhQuality, string> = {
+  M7: "מז'ורי",
+  m7: "מינורי",
+  X7: "דומיננטי",
+  hd7: "חצי מוקטן",
+  d7: "מוקטן",
+};
+
+/** Root-position triad tones [root, third, fifth], spelled. */
+export function triadPitches(root: SpelledPitch, q: TriadQuality): SpelledPitch[] {
+  const third = applyInterval(root, 3, q === "M" || q === "A" ? "major" : "minor", 1);
+  const fifthQ: IvQuality = q === "d" ? "dim" : q === "A" ? "aug" : "perfect";
+  const fifth = applyInterval(root, 5, fifthQ, 1);
+  return [root, third, fifth];
+}
+
+/** Root-position seventh-chord tones [root, 3, 5, 7], spelled. */
+export function seventhPitches(root: SpelledPitch, q: SeventhQuality): SpelledPitch[] {
+  const triadQ: TriadQuality = q === "M7" || q === "X7" ? "M" : q === "m7" ? "m" : "d";
+  const seventhQ: IvQuality = q === "M7" ? "major" : q === "d7" ? "dim" : "minor";
+  return [...triadPitches(root, triadQ), applyInterval(root, 7, seventhQ, 1)];
+}
+
+/** Rotate to the given inversion and stack in close position, bass at bassOctave. */
+export function invertChord(
+  tones: SpelledPitch[],
+  inversion: number,
+  bassOctave: number
+): SpelledPitch[] {
+  const rotated = [...tones.slice(inversion), ...tones.slice(0, inversion)];
+  const out: SpelledPitch[] = [];
+  let prevDia = -Infinity;
+  rotated.forEach((t, i) => {
+    let p = { ...t, octave: i === 0 ? bassOctave : out[0].octave };
+    while (diaOf(p) <= prevDia) p = { ...p, octave: p.octave + 1 };
+    prevDia = diaOf(p);
+    out.push(p);
+  });
+  return out;
+}
+
+/** Figured-bass label for a triad/seventh inversion (display strings for Fig). */
+export function figureOf(chordSize: 3 | 4, inversion: number): string {
+  if (chordSize === 3) return ["5/3", "6", "6/4"][inversion];
+  return ["7", "6/5", "4/3", "4/2"][inversion];
+}
+
+/** Diatonic triad on a scale degree: [root, third, fifth] spelled in the key. */
+export function diatonicTriad(
+  key: Key,
+  degree: number,
+  tonicOctave: number,
+  form: MinorForm = "natural"
+): SpelledPitch[] {
+  const lower = spellScale({ ...key.tonic, octave: tonicOctave }, key.mode, form);
+  const upper = spellScale({ ...key.tonic, octave: tonicOctave + 1 }, key.mode, form);
+  const scale = [...lower.slice(0, 7), ...upper.slice(0, 7)];
+  return [scale[degree - 1], scale[degree + 1], scale[degree + 3]];
+}
