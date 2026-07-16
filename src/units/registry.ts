@@ -65,6 +65,7 @@ export const UNITS: UnitMeta[] = [
     blurb: "גודל ואיכות, היפוך, סדרת העליונים, קונסוננס ודיסוננס והטריטון.",
     ready: true,
     component: lazy(() => import("./unit02/Unit02").then((m) => ({ default: m.Unit02 }))),
+    workbook: lazy(() => import("./unit02/Workbook02").then((m) => ({ default: m.Workbook02 }))),
   },
   {
     id: "03",

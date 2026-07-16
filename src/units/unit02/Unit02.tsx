@@ -4,6 +4,7 @@ import { Keyboard } from "../../components/Keyboard";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, Deg, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
 import { NextUnit } from "../../components/NextUnit";
+import { WorkbookCta } from "../../workbook/WorkbookCta";
 import { SeqEvent } from "../../engine/audio";
 import {
   CONSONANCE_HE,
@@ -620,6 +621,11 @@ export function Unit02() {
         <Drill title="היפוך מרווחים" generate={inversionQuestion} />
         <Drill title="קונסוננס או דיסוננס?" generate={consonanceQuestion} />
       </Section>
+
+      <WorkbookCta
+        unitId="02"
+        blurb="חמישה תרגילי מרווחים בסגנון ספר העבודה: זיהוי, בנייה מעל ומתחת לצליל נתון, היפוכים — וטרנספוזיציה של מנגינה שלמה."
+      />
 
       <NextUnit current={2}>
         <b>הבא בתור - יחידה 3: מקצב ומשקל.</b> הגובה הוא רק חצי מהסיפור: איך פעמות, משקלים והטעמות מארגנים

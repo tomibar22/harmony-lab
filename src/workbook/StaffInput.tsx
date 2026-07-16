@@ -10,6 +10,9 @@ type Props = {
   slots: number;
   value: (SpelledPitch | null)[];
   onChange: (next: (SpelledPitch | null)[]) => void;
+  /** Locked notes (e.g. the given note of an interval exercise): rendered
+   *  muted, not clickable, skipped by keyboard navigation. */
+  given?: (SpelledPitch | null)[];
   status?: SlotStatus[] | null;   // set after a check; cleared on edit by the parent
   highlight?: number | null;      // playback highlight
   disabled?: boolean;
@@ -45,11 +48,16 @@ const LETTER_KEYS: Record<string, number> = { c: 0, d: 1, e: 2, f: 3, g: 4, a: 5
 /** An interactive staff: n slots, click a line/space (or type A–G) to place a
  *  note in the active slot, arrows to nudge, accidental buttons to inflect.
  *  Empty slots show a dashed placeholder. Everything plays as it's placed. */
-export function StaffInput({ clef, slots, value, onChange, status, highlight, disabled, ariaLabel }: Props) {
+export function StaffInput({ clef, slots, value, onChange, given, status, highlight, disabled, ariaLabel }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const noteEls = useRef<(SVGGElement | null)[]>([]);
-  const [active, setActive] = useState(0);
+  const isLocked = (i: number) => !!given?.[i];
+  const firstEditable = Array.from({ length: slots }, (_, i) => i).find((i) => !isLocked(i)) ?? 0;
+  const [active, setActive] = useState(firstEditable);
   const themeVersion = useThemeVersion();
+
+  // what actually shows in each slot: a locked note wins over student input
+  const shown = Array.from({ length: slots }, (_, i) => given?.[i] ?? value[i] ?? null);
 
   const bottomDia = BOTTOM_LINE_DIA[clef];
   // usable pitch band: a 4th below the staff to a 5th above (ledger territory)
@@ -57,7 +65,7 @@ export function StaffInput({ clef, slots, value, onChange, status, highlight, di
   const maxDia = bottomDia + 13;
 
   const set = (i: number, p: SpelledPitch | null, play = true) => {
-    if (disabled) return;
+    if (disabled || isLocked(i)) return;
     const next = [...value];
     next[i] = p;
     onChange(next);
@@ -87,8 +95,7 @@ export function StaffInput({ clef, slots, value, onChange, status, highlight, di
     stave.setEndBarType(Barline.type.NONE);
     stave.setContext(context).draw();
 
-    const vexNotes = value
-      .slice(0, slots)
+    const vexNotes = shown
       .map((p) =>
         p
           ? new StaveNote({ keys: [vexKeyOf(p)], duration: "w", clef })
@@ -126,7 +133,7 @@ export function StaffInput({ clef, slots, value, onChange, status, highlight, di
     const lineGap = stave.getSpacingBetweenLines();
 
     // dashed placeholder on empty slots
-    value.slice(0, slots).forEach((p, i) => {
+    shown.forEach((p, i) => {
       if (p) return;
       const ph = document.createElementNS(NS, "ellipse");
       ph.setAttribute("cx", String(colXs[i]));
@@ -154,15 +161,19 @@ export function StaffInput({ clef, slots, value, onChange, status, highlight, di
       svg.insertBefore(band, svg.firstChild);
     }
 
-    // colour student notes: default accent-ish ink; status overrides
+    // colour notes: locked given notes muted, status (on editable) overrides
     noteEls.current = vexNotes.map((vn, i) => {
       const el =
         (vn as unknown as { getSVGElement?: () => SVGGElement | undefined }).getSVGElement?.() ??
         (vn as unknown as { attrs?: { el?: SVGGElement } }).attrs?.el ??
         null;
-      const st = status?.[i];
+      const st = isLocked(i) ? null : status?.[i];
       if (el && st) {
         const c = st === "ok" ? cssVar("--stable") : cssVar("--accent");
+        el.style.fill = c;
+        el.style.stroke = c;
+      } else if (el && isLocked(i)) {
+        const c = cssVar("--ink-soft");
         el.style.fill = c;
         el.style.stroke = c;
       }
@@ -174,6 +185,7 @@ export function StaffInput({ clef, slots, value, onChange, status, highlight, di
     const hitBottom = stave.getYForLine(4) + 60;
     if (!disabled) {
       colXs.forEach((cx, i) => {
+        if (isLocked(i)) return;
         const half = ((colXs[1] ?? colXs[0] + 56) - colXs[0]) / 2;
         const rect = document.createElementNS(NS, "rect");
         rect.setAttribute("x", String(cx - half));
@@ -216,18 +228,25 @@ export function StaffInput({ clef, slots, value, onChange, status, highlight, di
     svg.setAttribute("width", String(w));
     svg.setAttribute("height", String(Math.ceil(bottom - top)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, slots, clef, status, active, disabled, themeVersion]);
+  }, [value, given, slots, clef, status, active, disabled, themeVersion]);
 
   // playback highlight
   useEffect(() => {
     const gold = cssVar("--gold");
     noteEls.current.forEach((el, i) => {
       if (!el) return;
-      const st = status?.[i];
-      const base = st ? (st === "ok" ? cssVar("--stable") : cssVar("--accent")) : "";
+      const st = isLocked(i) ? null : status?.[i];
+      const base = st
+        ? st === "ok"
+          ? cssVar("--stable")
+          : cssVar("--accent")
+        : isLocked(i)
+          ? cssVar("--ink-soft")
+          : "";
       el.style.fill = i === highlight ? gold : base;
       el.style.stroke = i === highlight ? gold : base;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [highlight, status]);
 
   /* ---------- keyboard ---------- */
@@ -249,9 +268,13 @@ export function StaffInput({ clef, slots, value, onChange, status, highlight, di
       else place(active, bottomDia + 4, 0);
       e.preventDefault();
     } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-      // the staff is LTR: ArrowRight = next slot
+      // the staff is LTR: ArrowRight = next slot; locked slots are skipped
       const delta = e.key === "ArrowRight" ? 1 : -1;
-      setActive((a) => Math.max(0, Math.min(slots - 1, a + delta)));
+      setActive((a) => {
+        let n = a + delta;
+        while (n >= 0 && n < slots && isLocked(n)) n += delta;
+        return n >= 0 && n < slots ? n : a;
+      });
       e.preventDefault();
     } else if (e.key === "Backspace" || e.key === "Delete") {
       set(active, null, false);
@@ -263,7 +286,11 @@ export function StaffInput({ clef, slots, value, onChange, status, highlight, di
     } else if (e.key === "0" || e.key === "=") {
       if (cur) set(active, { ...cur, alter: 0 });
     } else if (e.key === "Tab" && !e.shiftKey && active < slots - 1) {
-      setActive((a) => a + 1);
+      setActive((a) => {
+        let n = a + 1;
+        while (n < slots && isLocked(n)) n += 1;
+        return n < slots ? n : a;
+      });
       e.preventDefault();
     }
   };

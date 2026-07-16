@@ -1,15 +1,23 @@
 import { ReactNode, useMemo, useState } from "react";
+import { playNote } from "../engine/audio";
 import { Score, ScoreNote } from "../components/Score";
 import { Deg, PlayButton, usePlayer } from "../components/ui";
 import { Chips, Feedback } from "./exercise";
 import {
   DEGREE_NAMES_ALL,
+  IV_NUMBER_HE,
+  IV_QUALITY_HE,
+  IvQuality,
   MinorForm,
   Mode,
   SpelledPitch,
+  applyInterval,
   degreeNameHe,
   degreePitch,
   findKey,
+  intervalBetween,
+  invertIv,
+  ivNameHe,
   keyOf,
   midiOf,
   nameHeOf,
@@ -472,6 +480,408 @@ export function SigWriteItem({
           ) : undefined
         }
       />
+    </div>
+  );
+}
+
+/* =========================================================================
+ * 5. Interval identification: a written dyad → size + quality.
+ * ========================================================================= */
+
+const IV_SIZE_OPTIONS = IV_NUMBER_HE.map((n, i) => ({ value: i + 1, label: n }));
+const IV_QUALITY_OPTIONS = (Object.keys(IV_QUALITY_HE) as IvQuality[]).map((q) => ({
+  value: q,
+  label: IV_QUALITY_HE[q],
+}));
+
+export type IntervalIdSpec = {
+  clef: Clef;
+  low: SpelledPitch;
+  high: SpelledPitch;
+};
+
+export function IntervalIdItem({
+  spec,
+  solved,
+  markSolved,
+}: {
+  spec: IntervalIdSpec;
+  solved: boolean;
+  markSolved: () => void;
+}) {
+  const answer = intervalBetween(spec.low, spec.high)!;
+  const [size, setSize] = useState<number | null>(null);
+  const [quality, setQuality] = useState<IvQuality | null>(null);
+  const [state, setState] = useState<"ok" | "bad" | null>(null);
+  const [failures, setFailures] = useState(0);
+  const [reveal, setReveal] = useState(false);
+
+  const check = () => {
+    const ok = size === answer.size && quality === answer.quality;
+    setState(ok ? "ok" : "bad");
+    if (ok) markSolved();
+    else setFailures((f) => f + 1);
+  };
+
+  return (
+    <div>
+      <div className="wb-prompt">
+        <div className="wb-prompt-text">
+          זהו את המרווח הכתוב — גודל ואיכות. שימו לב לאיות: אותו מרחק על המקלדת יכול להיות מרווח
+          אחר לגמרי על הנייר. לחיצה על המרווח משמיעה אותו.
+          {solved && <span className="wb-solvedmark"> ✓ נפתר</span>}
+        </div>
+        <div className="wb-prompt-score">
+          <Score
+            notes={[
+              {
+                keys: [vexKeyOf(spec.low), vexKeyOf(spec.high)],
+                midi: [midiOf(spec.low), midiOf(spec.high)],
+              },
+            ]}
+            clef={spec.clef}
+            width={130}
+            ariaLabel="המרווח לזיהוי"
+          />
+        </div>
+      </div>
+      <Chips
+        label="הגודל:"
+        options={IV_SIZE_OPTIONS}
+        value={size}
+        onChange={(v) => {
+          setSize(v);
+          setState(null);
+        }}
+        compact
+      />
+      <Chips
+        label="האיכות:"
+        options={IV_QUALITY_OPTIONS}
+        value={quality}
+        onChange={(v) => {
+          setQuality(v);
+          setState(null);
+        }}
+      />
+      <div className="wb-actions">
+        <button className="play-btn" onClick={check} disabled={size === null || quality === null}>
+          בדיקה
+        </button>
+        {failures >= 2 && !reveal && (
+          <button className="play-btn ghost" onClick={() => setReveal(true)}>
+            הצגת הפתרון
+          </button>
+        )}
+      </div>
+      <Feedback
+        state={state}
+        correct={
+          reveal ? (
+            <>
+              התשובה: <b>{ivNameHe(answer.size, answer.quality)}</b>.
+            </>
+          ) : undefined
+        }
+      />
+    </div>
+  );
+}
+
+/* =========================================================================
+ * 6. Interval writing: given a note, write the named interval above/below.
+ * ========================================================================= */
+
+export type IntervalWriteSpec = {
+  clef: Clef;
+  base: SpelledPitch;
+  size: number;
+  quality: IvQuality;
+  direction: 1 | -1; // 1 = write above the base, −1 = below
+};
+
+export function IntervalWriteItem({
+  spec,
+  solved,
+  markSolved,
+}: {
+  spec: IntervalWriteSpec;
+  solved: boolean;
+  markSolved: () => void;
+}) {
+  const expected = applyInterval(spec.base, spec.size, spec.quality, spec.direction);
+  const inv = invertIv(spec.size, spec.quality);
+  const [notes, setNotes] = useState<(SpelledPitch | null)[]>([null, null]);
+  const [status, setStatus] = useState<SlotStatus[] | null>(null);
+  const [state, setState] = useState<"ok" | "bad" | null>(null);
+  const [failures, setFailures] = useState(0);
+  const [reveal, setReveal] = useState(false);
+
+  const check = () => {
+    const p = notes[1];
+    if (!p) return;
+    const ok = sameSpelling(p, expected) && p.octave === expected.octave;
+    setStatus([null, ok ? "ok" : "bad"]);
+    setState(ok ? "ok" : "bad");
+    if (ok) {
+      markSolved();
+      void playNote([midiOf(spec.base), midiOf(p)]);
+    } else setFailures((f) => f + 1);
+  };
+
+  return (
+    <div>
+      <div className="wb-prompt">
+        <div className="wb-prompt-text">
+          כתבו <b>{ivNameHe(spec.size, spec.quality)}</b>{" "}
+          {spec.direction === 1 ? "מעל הצליל הנתון" : "מתחת לצליל הנתון"} — בתא הריק שלצידו.
+          {solved && <span className="wb-solvedmark"> ✓ נפתר</span>}
+        </div>
+      </div>
+      <StaffInput
+        clef={spec.clef}
+        slots={2}
+        value={notes}
+        given={[spec.base, null]}
+        onChange={(n) => {
+          setNotes(n);
+          setStatus(null);
+          setState(null);
+        }}
+        status={status}
+        ariaLabel="חמשה לכתיבת המרווח"
+      />
+      <div className="wb-actions">
+        <button className="play-btn" onClick={check} disabled={!notes[1]}>
+          בדיקה
+        </button>
+        {failures >= 2 && !reveal && (
+          <button className="play-btn ghost" onClick={() => setReveal(true)}>
+            הצגת הפתרון
+          </button>
+        )}
+      </div>
+      <Feedback
+        state={state}
+        correct={
+          reveal ? (
+            <>
+              התשובה: <b>{nameHeOf(expected)}</b>.
+            </>
+          ) : undefined
+        }
+      />
+      {state === "ok" && (
+        <div className="wb-solution">
+          <div className="wb-solution-label">
+            ובהיפוך (חוק ה־9): {ivNameHe(spec.size, spec.quality)} ← <b>{ivNameHe(inv.size, inv.quality)}</b>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================================
+ * 7. Interval inversion: name the inversion of a named interval.
+ * ========================================================================= */
+
+export type InversionSpec = { size: number; quality: IvQuality };
+
+export function InversionItem({
+  spec,
+  solved,
+  markSolved,
+}: {
+  spec: InversionSpec;
+  solved: boolean;
+  markSolved: () => void;
+}) {
+  const answer = invertIv(spec.size, spec.quality);
+  const [size, setSize] = useState<number | null>(null);
+  const [quality, setQuality] = useState<IvQuality | null>(null);
+  const [state, setState] = useState<"ok" | "bad" | null>(null);
+  const [failures, setFailures] = useState(0);
+  const [reveal, setReveal] = useState(false);
+
+  const check = () => {
+    const ok = size === answer.size && quality === answer.quality;
+    setState(ok ? "ok" : "bad");
+    if (ok) markSolved();
+    else setFailures((f) => f + 1);
+  };
+
+  return (
+    <div>
+      <div className="wb-prompt">
+        <div className="wb-prompt-text">
+          מה היפוכה של <b>{ivNameHe(spec.size, spec.quality)}</b>?
+          {solved && <span className="wb-solvedmark"> ✓ נפתר</span>}
+        </div>
+      </div>
+      <Chips
+        label="הגודל:"
+        options={IV_SIZE_OPTIONS.slice(0, 8)}
+        value={size}
+        onChange={(v) => {
+          setSize(v);
+          setState(null);
+        }}
+        compact
+      />
+      <Chips
+        label="האיכות:"
+        options={IV_QUALITY_OPTIONS}
+        value={quality}
+        onChange={(v) => {
+          setQuality(v);
+          setState(null);
+        }}
+      />
+      <div className="wb-actions">
+        <button className="play-btn" onClick={check} disabled={size === null || quality === null}>
+          בדיקה
+        </button>
+        {failures >= 2 && !reveal && (
+          <button className="play-btn ghost" onClick={() => setReveal(true)}>
+            הצגת הפתרון
+          </button>
+        )}
+      </div>
+      <Feedback
+        state={state}
+        correct={
+          reveal ? (
+            <>
+              התשובה: <b>{ivNameHe(answer.size, answer.quality)}</b>.
+            </>
+          ) : undefined
+        }
+      />
+    </div>
+  );
+}
+
+/* =========================================================================
+ * 8. Transposition: rewrite a short melody in a new key.
+ * ========================================================================= */
+
+export type TransposeSpec = {
+  clef: Clef;
+  sourceKeyHe: string; // major keys
+  targetKeyHe: string;
+  melody: SpelledPitch[]; // diatonic in the source key
+  size: number;           // the transposing interval...
+  quality: IvQuality;
+  direction: 1 | -1;      // ...and its direction
+};
+
+export function TransposeItem({
+  spec,
+  solved,
+  markSolved,
+}: {
+  spec: TransposeSpec;
+  solved: boolean;
+  markSolved: () => void;
+}) {
+  const sourceKey = findKey(spec.sourceKeyHe, "major");
+  const expected = useMemo(
+    () => spec.melody.map((p) => applyInterval(p, spec.size, spec.quality, spec.direction)),
+    [spec]
+  );
+  const n = spec.melody.length;
+  const [notes, setNotes] = useState<(SpelledPitch | null)[]>(Array(n).fill(null));
+  const [status, setStatus] = useState<SlotStatus[] | null>(null);
+  const [state, setState] = useState<"ok" | "bad" | null>(null);
+  const [failures, setFailures] = useState(0);
+  const [reveal, setReveal] = useState(false);
+  const player = usePlayer();
+
+  const given = useMemo(() => [expected[0], ...Array(n - 1).fill(null)] as (SpelledPitch | null)[], [expected, n]);
+  const merged = notes.map((p, i) => given[i] ?? p);
+  const allFilled = merged.every(Boolean);
+
+  const check = () => {
+    const st: SlotStatus[] = merged.map((p, i) =>
+      given[i] ? null : p && sameSpelling(p, expected[i]) && p.octave === expected[i].octave ? "ok" : "bad"
+    );
+    setStatus(st);
+    const ok = st.every((s) => s !== "bad");
+    setState(ok ? "ok" : "bad");
+    if (ok) {
+      markSolved();
+      void player.play(
+        expected.map((p, i) => ({ midi: midiOf(p), time: i * 0.5, dur: 0.55, idx: i })),
+        120
+      );
+    } else setFailures((f) => f + 1);
+  };
+
+  const sourceNotes: ScoreNote[] = spec.melody.map((p) => ({
+    keys: [vexKeyOf(p)],
+    midi: [midiOf(p)],
+  }));
+  const solutionNotes: ScoreNote[] = expected.map((p) => ({ keys: [vexKeyOf(p)], midi: [midiOf(p)] }));
+
+  return (
+    <div>
+      <div className="wb-prompt">
+        <div className="wb-prompt-text">
+          לפניכם מנגינה קצרה ב<b>{sourceKey.nameHe}</b>. העבירו אותה ל<b>
+            {findKey(spec.targetKeyHe, "major").nameHe}
+          </b>{" "}
+          ({ivNameHe(spec.size, spec.quality)} {spec.direction === 1 ? "מעלה" : "מטה"}). הצליל הראשון
+          כבר נתון; בלי סימן היתק בחמשה — כתבו כל היתק ליד התו.
+          {solved && <span className="wb-solvedmark"> ✓ נפתר</span>}
+        </div>
+      </div>
+      <div className="wb-prompt-score wb-source-melody">
+        <Score
+          notes={sourceNotes}
+          clef={spec.clef}
+          keySig={sourceKey.vex}
+          ariaLabel="המנגינה המקורית"
+        />
+      </div>
+      <StaffInput
+        clef={spec.clef}
+        slots={n}
+        value={notes}
+        given={given}
+        onChange={(next) => {
+          setNotes(next);
+          setStatus(null);
+          setState(null);
+        }}
+        status={status}
+        highlight={player.index}
+        ariaLabel="חמשה לכתיבת המנגינה בסולם החדש"
+      />
+      <div className="wb-actions">
+        <button className="play-btn" onClick={check} disabled={!allFilled}>
+          בדיקה
+        </button>
+        <PlayButton
+          ghost
+          label="השמעת המקור"
+          player={player}
+          events={spec.melody.map((p, i) => ({ midi: midiOf(p), time: i * 0.5, dur: 0.55 }))}
+          bpm={120}
+        />
+        {failures >= 2 && !reveal && (
+          <button className="play-btn ghost" onClick={() => setReveal(true)}>
+            הצגת הפתרון
+          </button>
+        )}
+      </div>
+      <Feedback state={state} />
+      {reveal && (
+        <div className="wb-solution">
+          <div className="wb-solution-label">הפתרון:</div>
+          <Score notes={solutionNotes} clef={spec.clef} ariaLabel="המנגינה בסולם החדש" />
+        </div>
+      )}
     </div>
   );
 }

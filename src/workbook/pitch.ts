@@ -157,3 +157,94 @@ export function sigLabel(sharps: number): string {
   if (sharps === 0) return "ללא";
   return sharps > 0 ? `${sharps}♯` : `${-sharps}♭`;
 }
+
+/* ---------------- spelled intervals ---------------- */
+
+export type IvQuality = "perfect" | "major" | "minor" | "aug" | "dim";
+
+export const IV_NUMBER_HE = [
+  "פרימה",
+  "סקונדה",
+  "טרצה",
+  "קוורטה",
+  "קווינטה",
+  "סקסטה",
+  "ספטימה",
+  "אוקטבה",
+  "נונה",
+  "דצימה",
+] as const;
+
+/** Interval names are feminine in Hebrew, so qualities take the feminine form. */
+export const IV_QUALITY_HE: Record<IvQuality, string> = {
+  perfect: "זכה",
+  major: "גדולה",
+  minor: "קטנה",
+  aug: "מוגדלת",
+  dim: "מוקטנת",
+};
+
+export function ivNameHe(size: number, quality: IvQuality): string {
+  return `${IV_NUMBER_HE[size - 1]} ${IV_QUALITY_HE[quality]}`;
+}
+
+const PERFECT_SIZES = new Set([1, 4, 5, 8, 11, 12]);
+
+/** Reference semitones of the perfect/major interval of each generic size. */
+function refSemitones(size: number): number {
+  const base = [0, 2, 4, 5, 7, 9, 11][(size - 1) % 7];
+  return base + 12 * Math.floor((size - 1) / 7);
+}
+
+/** The spelled interval between two pitches (low → high), or null when the
+ *  spelling falls outside dim..aug. Order-insensitive: measures |a→b|. */
+export function intervalBetween(
+  a: SpelledPitch,
+  b: SpelledPitch
+): { size: number; quality: IvQuality } | null {
+  const [low, high] = midiOf(a) <= midiOf(b) ? [a, b] : [b, a];
+  const size = diaOf(high) - diaOf(low) + 1;
+  if (size < 1 || size > IV_NUMBER_HE.length) return null;
+  const delta = midiOf(high) - midiOf(low) - refSemitones(size);
+  if (PERFECT_SIZES.has(size)) {
+    if (delta === 0) return { size, quality: "perfect" };
+    if (delta === 1) return { size, quality: "aug" };
+    if (delta === -1) return { size, quality: "dim" };
+  } else {
+    if (delta === 0) return { size, quality: "major" };
+    if (delta === -1) return { size, quality: "minor" };
+    if (delta === 1) return { size, quality: "aug" };
+    if (delta === -2) return { size, quality: "dim" };
+  }
+  return null;
+}
+
+/** Build the pitch a spelled interval above (+1) or below (−1) a base note. */
+export function applyInterval(
+  base: SpelledPitch,
+  size: number,
+  quality: IvQuality,
+  direction: 1 | -1
+): SpelledPitch {
+  const qDelta: number = PERFECT_SIZES.has(size)
+    ? { perfect: 0, aug: 1, dim: -1, major: NaN, minor: NaN }[quality]
+    : { major: 0, minor: -1, aug: 1, dim: -2, perfect: NaN }[quality];
+  const semis = refSemitones(size) + qDelta;
+  const dia = diaOf(base) + direction * (size - 1);
+  const natural = pitchFromDia(dia);
+  const alter = midiOf(base) + direction * semis - midiOf(natural);
+  return { ...natural, alter };
+}
+
+const QUALITY_INV: Record<IvQuality, IvQuality> = {
+  perfect: "perfect",
+  major: "minor",
+  minor: "major",
+  aug: "dim",
+  dim: "aug",
+};
+
+/** Inversion (simple intervals 1..8): numbers sum to 9, quality flips. */
+export function invertIv(size: number, quality: IvQuality): { size: number; quality: IvQuality } {
+  return { size: 9 - size, quality: QUALITY_INV[quality] };
+}
