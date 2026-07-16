@@ -96,9 +96,15 @@ function renderMusicRuns(text: string, prefix: string): ReactNode[] {
 /* an arrow ("goes to") connector: a bare ← → ↔ with only spaces/bidi marks
    around it. Isolated LTR music tokens on either side of such an arrow scramble
    in RTL flow (each token is its own LTR run and the neutral arrow reorders
-   them), so runs of "token → arrow → token" must be laid out as one RTL unit. */
-const ARROW_ONLY = /^[\s‎‏]*[←→↔⇐⇒][\s‎‏]*$/;
+   them). A chord/degree progression is LTR material - like the dash chains -
+   so a run of "token → arrow → token" is laid out as one LTR island: the
+   symbols read left-to-right (II V I ends on I at the right) and the arrows are
+   normalized to point rightward, matching the reading direction. The source may
+   author them as leftward ← (the "goes to" glyph used inside Hebrew prose); the
+   token order is unchanged, only the layout and glyph direction flip. */
+const ARROW_ONLY = /^[\s‎‏]*[←→↔⇐⇒⇔][\s‎‏]*$/;
 const isArrowStr = (n: ReactNode) => typeof n === "string" && ARROW_ONLY.test(n);
+const rightward = (s: string) => s.replace(/←/g, "→").replace(/⇐/g, "⇒");
 
 function groupArrows(parts: ReactNode[]): ReactNode[] {
   const out: ReactNode[] = [];
@@ -107,11 +113,11 @@ function groupArrows(parts: ReactNode[]): ReactNode[] {
       const run: ReactNode[] = [parts[i]];
       let j = i + 1;
       while (isArrowStr(parts[j]) && isValidElement(parts[j + 1])) {
-        run.push(parts[j], parts[j + 1]);
+        run.push(rightward(parts[j] as string), parts[j + 1]);
         j += 2;
       }
       out.push(
-        <span key={`flow-${i}`} className="rn-flow" dir="rtl">
+        <span key={`flow-${i}`} className="rn-flow" dir="ltr">
           {run.map((r, ri) => (isValidElement(r) ? cloneElement(r, { key: r.key ?? `f-${ri}` }) : r))}
         </span>
       );
