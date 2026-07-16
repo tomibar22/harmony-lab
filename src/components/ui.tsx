@@ -48,7 +48,7 @@ export function Rn({ n }: { n: string }) {
    "6/5" figures and lone "♭2"-style degrees, and wraps each in an LTR isolate.
    Used by titles, blurbs, drill options and (via bidi()) all lesson prose. */
 const MUSIC_TOKEN =
-  /(?<![A-Za-z])([♭♯]?)(It|Ger|Fr|[IVX]+|[ivx]+)(°|ø)?(?:(\d)\/?(\d)|(\d))?([♭♯]\d)?(?![A-Za-z])|(?<![\d/])(\d)\/(\d)(?![\d/])|[♭♯]\d/g;
+  /(?<![A-Za-z])([♭♯]?)(It|Ger|Fr|[IVX]+|[ivx]+)(°|ø)?(?:(\d)\/?(\d)|(\d))?([♭♯]\d?)?(?![A-Za-z])|(?<![\d/])(\d)\/(\d)(?![\d/])|[♭♯]\d/g;
 
 /* a progression/degree chain: tokens joined by dashes ("I–IV6–V–I", "5–6",
    "T–S–D–T"). The whole chain must be one LTR unit - isolating only the
@@ -93,6 +93,36 @@ function renderMusicRuns(text: string, prefix: string): ReactNode[] {
   return parts;
 }
 
+/* an arrow ("goes to") connector: a bare ← → ↔ with only spaces/bidi marks
+   around it. Isolated LTR music tokens on either side of such an arrow scramble
+   in RTL flow (each token is its own LTR run and the neutral arrow reorders
+   them), so runs of "token → arrow → token" must be laid out as one RTL unit. */
+const ARROW_ONLY = /^[\s‎‏]*[←→↔⇐⇒][\s‎‏]*$/;
+const isArrowStr = (n: ReactNode) => typeof n === "string" && ARROW_ONLY.test(n);
+
+function groupArrows(parts: ReactNode[]): ReactNode[] {
+  const out: ReactNode[] = [];
+  for (let i = 0; i < parts.length; i++) {
+    if (isValidElement(parts[i]) && isArrowStr(parts[i + 1]) && isValidElement(parts[i + 2])) {
+      const run: ReactNode[] = [parts[i]];
+      let j = i + 1;
+      while (isArrowStr(parts[j]) && isValidElement(parts[j + 1])) {
+        run.push(parts[j], parts[j + 1]);
+        j += 2;
+      }
+      out.push(
+        <span key={`flow-${i}`} className="rn-flow" dir="rtl">
+          {run.map((r, ri) => (isValidElement(r) ? cloneElement(r, { key: r.key ?? `f-${ri}` }) : r))}
+        </span>
+      );
+      i = j - 1;
+    } else {
+      out.push(parts[i]);
+    }
+  }
+  return out;
+}
+
 export function FigText({ text }: { text: string }) {
   const parts: ReactNode[] = [];
   let last = 0;
@@ -108,7 +138,7 @@ export function FigText({ text }: { text: string }) {
     last = m.index! + m[0].length;
   }
   if (last < text.length) parts.push(...renderMusicRuns(text.slice(last), `t${k + 1}-`));
-  return <>{parts}</>;
+  return <>{groupArrows(parts)}</>;
 }
 
 /* ---------- recursive bidi fixer for lesson prose ----------
