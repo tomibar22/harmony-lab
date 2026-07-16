@@ -75,6 +75,7 @@ export const UNITS: UnitMeta[] = [
     blurb: "פעמה וטמפו, ערכי משך, משקלים פשוטים ומורכבים, סינקופה וקדמה.",
     ready: true,
     component: lazy(() => import("./unit03/Unit03").then((m) => ({ default: m.Unit03 }))),
+    workbook: lazy(() => import("./unit03/Workbook03").then((m) => ({ default: m.Workbook03 }))),
   },
   {
     id: "04",

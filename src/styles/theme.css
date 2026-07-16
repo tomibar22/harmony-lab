@@ -435,6 +435,30 @@ footer.site { text-align: center; color: var(--ink-soft); font-size: 0.8rem; pad
 .wb-chip:hover:not(:disabled) { border-color: var(--ink-soft); }
 .wb-chip.sel { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
+/* barline-placement gaps */
+.wb-gaps {
+  display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+  margin-top: 0.6rem; padding: 0.5rem 0.75rem;
+  background: var(--paper-deep); border-radius: 8px; width: fit-content; max-width: 100%;
+}
+.wb-gap {
+  display: inline-flex; align-items: center; gap: 0.15rem;
+  background: none; border: none; cursor: pointer; color: var(--ink);
+  font-size: 1.15rem; padding: 0.15rem 0.1rem; border-radius: 6px;
+}
+.wb-gap.last { cursor: default; }
+.wb-gap-note { pointer-events: none; }
+.wb-gap-bar {
+  display: inline-grid; place-items: center; width: 1.15rem; height: 1.6rem;
+  border-radius: 5px; color: var(--ink-soft); font-size: 1rem;
+  transition: background 0.15s, color 0.15s;
+}
+button.wb-gap:hover .wb-gap-bar { background: var(--gold-soft); color: var(--ink); }
+.wb-gap.on .wb-gap-bar { color: var(--accent); font-weight: 700; background: var(--accent-soft); }
+
+/* phrase-group score lines */
+.wb-phrase-lines { direction: ltr; overflow-x: auto; display: grid; gap: 0.25rem; }
+
 /* CTA card inside a unit */
 .wb-cta {
   display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap;

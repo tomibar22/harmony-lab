@@ -3,6 +3,7 @@ import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
 import { NextUnit } from "../../components/NextUnit";
+import { WorkbookCta } from "../../workbook/WorkbookCta";
 import { SeqEvent } from "../../engine/audio";
 
 /* ---------------- rhythm helpers ---------------- */
@@ -574,6 +575,11 @@ export function Unit03() {
         <Drill title="פשוט או מורכב?" generate={classifyMeterQuestion} />
         <Drill title="מונחי הטמפו" generate={tempoQuestion} />
       </Section>
+
+      <WorkbookCta
+        unitId="03"
+        blurb="חמישה תרגילי זמן בסגנון ספר העבודה: זיהוי משקל בהאזנה, השלמת תיבות, הצבת קווי תיבה, סינקופה והמיולה מול מטרונום — וקיבוץ פראזות מן הרפרטואר."
+      />
 
       <NextUnit current={3}>
         <b>הבא בתור - יחידה 4: משולשים וספטאקורדים.</b> מהמרווחים אל האקורדים: איך בונים משולש, מה מבדיל
