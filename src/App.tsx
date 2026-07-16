@@ -125,12 +125,13 @@ function Home() {
 export default function App() {
   const route = useHashRoute();
   const { theme, cycle } = useTheme();
-  const unitMatch = route.match(/^#\/unit\/(\d+)/);
+  const unitMatch = route.match(/^#\/unit\/(\d+)(\/workbook)?/);
   // compare numerically so a typed "#/unit/8" matches the zero-padded id "08"
   const unit = unitMatch
     ? UNITS.find((u) => Number(u.id) === Number(unitMatch[1]) && u.ready)
     : undefined;
-  const UnitComp = unit?.component;
+  const wantsWorkbook = !!unitMatch?.[2];
+  const UnitComp = wantsWorkbook ? unit?.workbook : unit?.component;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -152,7 +153,13 @@ export default function App() {
           {theme === "dark" ? "☀️" : "🌙"}
         </button>
       </header>
-      {UnitComp ? (
+      {UnitComp && wantsWorkbook ? (
+        <main className="workbook-wrap">
+          <Suspense fallback={<p style={{ padding: "3rem", color: "var(--ink-soft)" }}>טוען את ספר העבודה…</p>}>
+            <UnitComp />
+          </Suspense>
+        </main>
+      ) : UnitComp ? (
         <div className="lesson-wrap">
           <Toc key={route} />
           <main>

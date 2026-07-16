@@ -348,3 +348,103 @@ section.lesson-section { margin-bottom: 4rem; scroll-margin-top: 5rem; }
 }
 .next-unit .next-link:hover { transform: translateY(-1px); opacity: 0.95; box-shadow: var(--shadow-lift); }
 footer.site { text-align: center; color: var(--ink-soft); font-size: 0.8rem; padding: 2rem 1rem 3rem; border-top: 1px solid var(--line); }
+
+/* ---------- workbook ---------- */
+.workbook-wrap { max-width: 780px; margin: 0 auto; padding: 2.5rem 1.5rem 7rem; display: block; }
+.workbook .wb-back {
+  display: inline-block; margin-top: 0.4rem; color: var(--accent);
+  font-weight: 600; text-decoration: none; font-size: 0.92rem;
+}
+.workbook .wb-back:hover { text-decoration: underline; }
+
+/* exercise card (accordion) */
+.wb-card { padding: 0; overflow: hidden; }
+.wb-cardhead {
+  display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 1rem;
+  background: none; border: none; cursor: pointer; color: var(--ink);
+  padding: 1.05rem 1.4rem; text-align: start;
+}
+.wb-cardhead:hover { background: var(--paper-deep); }
+.wb-card.open .wb-cardhead { border-bottom: 1px solid var(--card-line); }
+.wb-cardtitle { font-family: var(--font-display); font-size: 1.12rem; }
+.wb-count {
+  font-size: 0.8rem; font-weight: 700; color: var(--ink-soft);
+  background: var(--paper-deep); border-radius: 999px; padding: 0.15rem 0.7rem;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.wb-count.full { background: var(--stable-soft); color: var(--stable); }
+.wb-cardbody { padding: 1.1rem 1.4rem 1.4rem; }
+.wb-instructions { margin: 0 0 1rem; color: var(--ink-soft); font-size: 0.95rem; max-width: 62ch; }
+
+/* item dots */
+.wb-dots { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+.wb-dot {
+  width: 2rem; height: 2rem; border-radius: 50%; border: 1.5px solid var(--line);
+  background: var(--card); color: var(--ink-soft); font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; display: grid; place-items: center; transition: all 0.15s;
+  font-variant-numeric: tabular-nums;
+}
+.wb-dot:hover { border-color: var(--ink-soft); }
+.wb-dot.done { background: var(--stable-soft); border-color: var(--stable); color: var(--stable); }
+.wb-dot.cur { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold-soft); color: var(--ink); }
+.wb-dot.cur.done { color: var(--stable); }
+
+/* item body */
+.wb-prompt { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.wb-prompt-text { flex: 1 1 260px; font-size: 0.98rem; }
+.wb-prompt-score { flex: 0 0 auto; direction: ltr; }
+.wb-solvedmark { color: var(--stable); font-weight: 700; font-size: 0.85rem; margin-inline-start: 0.4rem; }
+.wb-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin-top: 0.9rem; }
+.wb-nav { display: flex; justify-content: space-between; margin-top: 1.2rem; padding-top: 0.9rem; border-top: 1px dashed var(--line); }
+.wb-feedback { min-height: 1.7em; margin-top: 0.7rem; font-size: 0.95rem; }
+.wb-ok { color: var(--stable); font-weight: 700; }
+.wb-bad { color: var(--accent); font-weight: 600; }
+.wb-solution { margin-top: 0.9rem; padding: 0.8rem 1rem; background: var(--paper-deep); border-radius: 8px; }
+.wb-solution-label { font-size: 0.88rem; color: var(--ink-soft); margin-bottom: 0.3rem; }
+.wb-solution .score { direction: ltr; }
+.wb-sig-preview { margin-top: 0.6rem; direction: ltr; }
+
+/* staff input */
+.staff-input .si-staff { direction: ltr; overflow-x: auto; border-radius: 8px; }
+.staff-input .si-staff:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.staff-input .si-staff svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+.si-toolbar { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.si-accs { display: flex; gap: 0.3rem; }
+.si-acc {
+  min-width: 2.1rem; height: 2.1rem; border-radius: 8px; border: 1.5px solid var(--line);
+  background: var(--card); color: var(--ink); font-size: 1.05rem; cursor: pointer;
+  display: grid; place-items: center; transition: all 0.15s; padding: 0 0.5rem;
+}
+.si-acc:hover:not(:disabled) { border-color: var(--ink-soft); }
+.si-acc:disabled { opacity: 0.4; cursor: default; }
+.si-acc.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.si-del { font-size: 0.82rem; font-weight: 600; }
+.si-hint { font-size: 0.76rem; color: var(--ink-soft); }
+@media (max-width: 640px) { .si-hint { display: none; } }
+
+/* chips */
+.wb-chips-group { display: flex; gap: 0.6rem; align-items: baseline; margin-top: 0.7rem; flex-wrap: wrap; }
+.wb-chips-label { font-size: 0.88rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
+.wb-chips { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.wb-chip {
+  border: 1.5px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 999px; padding: 0.28rem 0.8rem; font-size: 0.88rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.wb-chips.compact .wb-chip { padding: 0.22rem 0.6rem; font-size: 0.82rem; }
+.wb-chip:hover:not(:disabled) { border-color: var(--ink-soft); }
+.wb-chip.sel { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+/* CTA card inside a unit */
+.wb-cta {
+  display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap;
+  margin-top: 3rem; padding: 1.3rem 1.5rem;
+  background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius);
+  box-shadow: var(--shadow); position: relative; overflow: hidden;
+}
+.wb-cta::after {
+  content: ""; position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--gold); opacity: 0.9;
+}
+.wb-cta-text b { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; }
+.wb-cta-text p { margin: 0.25rem 0 0; color: var(--ink-soft); font-size: 0.9rem; max-width: 52ch; }

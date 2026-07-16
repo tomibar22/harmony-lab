@@ -8,6 +8,8 @@ export type UnitMeta = {
   blurb: string;
   ready: boolean;
   component?: ComponentType;
+  /** Interactive workbook page (exercises), when the unit has one. */
+  workbook?: ComponentType;
 };
 
 /** The learning map, following the book's large-scale division. */
@@ -53,6 +55,7 @@ export const UNITS: UnitMeta[] = [
     blurb: "טוניקה ודרגות, יציב ופעיל, סימני היתק, שלוש צורות המינור ושבעת המודוסים.",
     ready: true,
     component: lazy(() => import("./unit01/Unit01").then((m) => ({ default: m.Unit01 }))),
+    workbook: lazy(() => import("./unit01/Workbook01").then((m) => ({ default: m.Workbook01 }))),
   },
   {
     id: "02",

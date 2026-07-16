@@ -5,6 +5,7 @@ import { CircleOfFifths } from "../../components/CircleOfFifths";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, Deg, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
 import { NextUnit } from "../../components/NextUnit";
+import { WorkbookCta } from "../../workbook/WorkbookCta";
 import { SeqEvent } from "../../engine/audio";
 import {
   DEGREE_NAMES_HE,
@@ -493,6 +494,11 @@ export function Unit01() {
         <Drill title="המינור הרלטיבי" generate={relativeMinorQuestion} />
         <Drill title="שמות הדרגות" generate={degreeNameQuestion} />
       </Section>
+
+      <WorkbookCta
+        unitId="01"
+        blurb="שמונה תרגילי כתיב וזיהוי בסגנון ספר העבודה: כתיבת סולמות על החמשה, דרגות וסימני היתק — במז'ור ובשלוש צורות המינור."
+      />
 
       <NextUnit current={1}>
         <b>הבא בתור - יחידה 2: מרווחים.</b> איך מודדים את המרחק בין שני צלילים, מה היא סדרת העליונים,
