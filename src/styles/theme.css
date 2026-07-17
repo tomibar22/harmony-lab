@@ -435,6 +435,30 @@ footer.site { text-align: center; color: var(--ink-soft); font-size: 0.8rem; pad
 .wb-chip:hover:not(:disabled) { border-color: var(--ink-soft); }
 .wb-chip.sel { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
+/* SATB chord input */
+.si-voices { display: flex; gap: 0.35rem; margin-bottom: 0.4rem; }
+.si-voice {
+  border: 1.5px solid var(--line); background: var(--card); color: var(--ink-soft);
+  border-radius: 999px; padding: 0.22rem 0.85rem; font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+}
+.si-voice:hover:not(:disabled) { border-color: var(--ink-soft); }
+.si-voice.filled { color: var(--ink); }
+.si-voice.on { border-color: var(--gold); color: var(--ink); box-shadow: 0 0 0 2px var(--gold-soft); }
+.satb-input .si-staff svg { margin: 0; }
+
+/* violation list under the SATB builder */
+.wb-violations {
+  margin: 0.7rem 0 0; padding: 0.6rem 1.2rem 0.6rem 0.8rem; list-style: none;
+  background: var(--paper-deep); border-radius: 8px; font-size: 0.92rem;
+  display: grid; gap: 0.25rem;
+}
+.wb-violations li { padding-inline-start: 1.1em; position: relative; }
+.wb-violations li::before { content: "•"; position: absolute; inset-inline-start: 0; }
+.wb-violations li.err { color: var(--accent); font-weight: 600; }
+.wb-violations li.warn { color: var(--gold); font-weight: 600; }
+.wb-violation-voices { font-weight: 400; color: var(--ink-soft); }
+
 /* barline-placement gaps */
 .wb-gaps {
   display: flex; align-items: center; gap: 0; flex-wrap: wrap;

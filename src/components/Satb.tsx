@@ -54,6 +54,7 @@ export function SatbScores({
   width,
   label,
   accidentalKey,
+  keySig,
 }: {
   chords: Satb[];
   marks?: (string | undefined)[];
@@ -61,6 +62,7 @@ export function SatbScores({
   width?: number;
   label: string;
   accidentalKey?: string;
+  keySig?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const upperEls = useRef<(SVGGElement | null)[]>([]);
@@ -83,8 +85,10 @@ export function SatbScores({
 
       const upper = new Stave(16, upperY, w - 22);
       upper.addClef("treble");
+      if (keySig) upper.addKeySignature(keySig);
       const lower = new Stave(16, lowerY, w - 22);
       lower.addClef("bass");
+      if (keySig) lower.addKeySignature(keySig);
       upper.setContext(context).draw();
       lower.setContext(context).draw();
 
@@ -99,7 +103,7 @@ export function SatbScores({
         (c) => new StaveNote({ keys: [c.b[0], c.t[0]], duration: "w", clef: "bass" })
       );
 
-      const key = accidentalKey ?? "C";
+      const key = accidentalKey ?? keySig ?? "C";
       const upperVoice = new Voice({ numBeats: 4, beatValue: 4 }).setMode(Voice.Mode.SOFT);
       upperVoice.addTickables(upperNotes);
       const lowerVoice = new Voice({ numBeats: 4, beatValue: 4 }).setMode(Voice.Mode.SOFT);
@@ -222,7 +226,7 @@ export function SatbScores({
     svg.setAttribute("viewBox", `0 ${top} ${w} ${bottom - top}`);
     svg.setAttribute("width", String(w));
     svg.setAttribute("height", String(bottom - top));
-  }, [chords, marks, width, label, accidentalKey, themeVersion]);
+  }, [chords, marks, width, label, accidentalKey, keySig, themeVersion]);
 
   // playback highlight: gold on the active chord's notes in both staves
   useEffect(() => {

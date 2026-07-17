@@ -3,6 +3,7 @@ import { Score, ScoreNote } from "../../components/Score";
 import { Drill, Question, pick, shuffle } from "../../components/Drill";
 import { Callout, Deg, PlayButton, Section, Term, Widget, usePlayer } from "../../components/ui";
 import { NextUnit } from "../../components/NextUnit";
+import { WorkbookCta } from "../../workbook/WorkbookCta";
 import { Satb, SatbScores, chordSeq } from "../../components/Satb";
 
 /* ---------------- the voices and their ranges ---------------- */
@@ -362,6 +363,11 @@ export function Unit06() {
         <Drill title="תקין או שגיאה?" generate={motionCheckQuestion} />
         <Drill title="צלילים מחויבים" generate={tendencyQuestion} />
       </Section>
+
+      <WorkbookCta
+        unitId="06"
+        blurb="חמישה תרגילים בסגנון ספר העבודה: זיהוי אקורדים בארבעה קולות, ספרות רומיות, בנייה חופשית עם בדיקת כללים מלאה — וציד שגיאות מבנה והובלת קולות."
+      />
 
       <NextUnit current={6}>
         <b>סיימתם את חלק היסודות!</b> מכאן נפתח לב הספר - יחידה 7 פותחת את חלק ב' עם ציר הטוניקה

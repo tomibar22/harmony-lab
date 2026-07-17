@@ -104,6 +104,7 @@ export const UNITS: UnitMeta[] = [
     blurb: "SATB, טווחים ופריסות, הכפלות, מקבילות אסורות וקדנצה שלמה.",
     ready: true,
     component: lazy(() => import("./unit06/Unit06").then((m) => ({ default: m.Unit06 }))),
+    workbook: lazy(() => import("./unit06/Workbook06").then((m) => ({ default: m.Workbook06 }))),
   },
   {
     id: "07",
