@@ -436,6 +436,11 @@ footer.site { text-align: center; color: var(--ink-soft); font-size: 0.8rem; pad
 .wb-chip.sel { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
 /* SATB chord input */
+/* render the grand staff larger than its 300-unit canvas: bigger touch
+   targets on phones, easier precision everywhere (hit-mapping is CTM-based
+   so it scales with the display size) */
+.satb-input .si-staff svg { width: min(100%, 430px); height: auto; }
+.si-nudge { font-size: 0.72rem; }
 .si-voices { display: flex; gap: 0.35rem; margin-bottom: 0.4rem; }
 .si-voice {
   border: 1.5px solid var(--line); background: var(--card); color: var(--ink-soft);

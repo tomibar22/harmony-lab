@@ -63,12 +63,19 @@ export function SatbInput({
     if (disabled) return;
     onChange({ ...value, [voice]: p });
     if (p && play) void playNote(midiOf(p));
-    if (p) {
-      // auto-advance to the next empty voice so a chord builds bass-upward
-      const next = FILL_ORDER.find((v) => v !== voice && !value[v] && v !== active);
-      const stillEmpty = FILL_ORDER.find((v) => v !== voice && !value[v]);
-      setActive(next ?? stillEmpty ?? voice);
-    }
+    // focus STAYS on the voice just written, so accidentals and the nudge
+    // arrows apply to it; the next staff click finds the next empty voice
+    // by itself (see the placement-priority rule in the click handler)
+    if (p) setActive(voice);
+  };
+
+  /** Move the active voice's note by diatonic steps (accidental resets). */
+  const nudge = (delta: number) => {
+    const cur = value[active];
+    if (!cur || disabled) return;
+    const bottomDia = STAFF_OF[active] === "treble" ? TREBLE_BOTTOM : BASS_BOTTOM;
+    const dia = Math.max(bottomDia - 6, Math.min(bottomDia + 13, diaOf(cur) + delta));
+    set(active, pitchFromDia(dia, 0));
   };
 
   /* ---------- engraving ---------- */
@@ -190,13 +197,30 @@ export function SatbInput({
           const loc = pt.matrixTransform(svg.getScreenCTM()!.inverse());
           const lineGap = stave.getSpacingBetweenLines();
           const step = Math.round((stave.getYForLine(4) - loc.y) / (lineGap / 2));
-          const dia = Math.max(bottomDia - 5, Math.min(bottomDia + 12, bottomDia + step));
+          const dia = Math.max(bottomDia - 6, Math.min(bottomDia + 13, bottomDia + step));
           // the click names a staff: place the active voice if it lives here,
           // otherwise fall to this staff's first empty (or lower) voice
           const voices: VoiceName[] = kind === "treble" ? ["s", "a"] : ["t", "b"];
-          const target: VoiceName = voices.includes(active)
-            ? active
-            : voices.find((v) => !value[v]) ?? voices[1];
+          // empty voices fill bottom-up (bass before tenor, alto before soprano)
+          const fillOrder: VoiceName[] = kind === "treble" ? ["a", "s"] : ["b", "t"];
+          // placement priority: the active voice if it's here and still empty;
+          // otherwise this staff's lowest empty voice; otherwise (all filled)
+          // the active voice if it's here, so clicks keep editing it
+          const fallback: VoiceName =
+            voices.includes(active) && !value[active]
+              ? active
+              : fillOrder.find((v) => !value[v]) ??
+                (voices.includes(active) ? active : fillOrder[0]);
+          // grab-to-correct: tapping ON an existing note selects and moves it
+          // instead of stacking the next voice on top of it. A near-miss
+          // (one step away) grabs only when nothing new would be placed.
+          const near = voices
+            .filter((v) => value[v] && Math.abs(diaOf(value[v]!) - dia) <= 1)
+            .sort(
+              (x, y) => Math.abs(diaOf(value[x]!) - dia) - Math.abs(diaOf(value[y]!) - dia)
+            )[0];
+          const exactHit = near && Math.abs(diaOf(value[near]!) - dia) === 0;
+          const target: VoiceName = near && (exactHit || value[fallback]) ? near : fallback;
           setActive(target);
           setTimeout(() => set(target, pitchFromDia(dia, 0)), 0);
         });
@@ -204,13 +228,31 @@ export function SatbInput({
       });
     }
 
-    // trim: content is fixed-height here; just tighten top/bottom a bit
-    const top = upperY - 26;
-    const bottom = lowerY + 78;
+    // trim to the real content: keep the full clickable band around both
+    // staves and stretch further when ledger-line notes poke out of it
+    const boxes = entries
+      .map(({ note }) => {
+        try {
+          return note?.getBoundingBox() ?? null;
+        } catch {
+          return null;
+        }
+      })
+      .filter((bb): bb is NonNullable<typeof bb> => !!bb);
+    const top = Math.floor(
+      Math.min(upper.getYForLine(0) - 30, ...boxes.map((bb) => bb.getY() - 5))
+    );
+    const bottom = Math.ceil(
+      Math.max(lower.getYForLine(4) + 30, ...boxes.map((bb) => bb.getY() + bb.getH() + 6))
+    );
     renderer.resize(w, bottom - top);
     svg.setAttribute("viewBox", `0 ${top} ${w} ${bottom - top}`);
     svg.setAttribute("width", String(w));
     svg.setAttribute("height", String(bottom - top));
+    // VexFlow pins inline width/height; clear them so the stylesheet can
+    // scale the staff up (bigger touch targets, especially on phones)
+    svg.style.width = "";
+    svg.style.height = "";
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(value), JSON.stringify(status ?? null), active, disabled, themeVersion]);
 
@@ -279,6 +321,24 @@ export function SatbInput({
       />
       {!disabled && (
         <div className="si-toolbar" dir="rtl">
+          <div className="si-accs" role="group" aria-label="הזזת הצליל">
+            <button
+              className="si-acc si-nudge"
+              onClick={() => nudge(1)}
+              disabled={!value[active]}
+              aria-label="הזזת הצליל מעלה"
+            >
+              ▲
+            </button>
+            <button
+              className="si-acc si-nudge"
+              onClick={() => nudge(-1)}
+              disabled={!value[active]}
+              aria-label="הזזת הצליל מטה"
+            >
+              ▼
+            </button>
+          </div>
           <div className="si-accs" role="group" aria-label="סימני היתק">
             {[
               { a: 2, g: "𝄪" },
@@ -301,7 +361,7 @@ export function SatbInput({
           <button className="si-acc si-del" onClick={() => set(active, null, false)} disabled={!value[active]}>
             מחיקה
           </button>
-          <span className="si-hint">בונים מהבס למעלה · הקול הפעיל מסומן בזהב</span>
+          <span className="si-hint">בונים מהבס למעלה · הקשה על תו קיים בוחרת אותו · ▲▼ מכווננים</span>
         </div>
       )}
     </div>

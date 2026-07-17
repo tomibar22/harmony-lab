@@ -314,6 +314,24 @@ export function StaffInput({ clef, slots, value, onChange, given, status, highli
       />
       {!disabled && (
         <div className="si-toolbar" dir="rtl">
+          <div className="si-accs" role="group" aria-label="הזזת הצליל">
+            <button
+              className="si-acc si-nudge"
+              onClick={() => value[active] && place(active, diaOf(value[active]!) + 1)}
+              disabled={!value[active]}
+              aria-label="הזזת הצליל מעלה"
+            >
+              ▲
+            </button>
+            <button
+              className="si-acc si-nudge"
+              onClick={() => value[active] && place(active, diaOf(value[active]!) - 1)}
+              disabled={!value[active]}
+              aria-label="הזזת הצליל מטה"
+            >
+              ▼
+            </button>
+          </div>
           <div className="si-accs" role="group" aria-label="סימני היתק">
             {[
               { a: 2, g: "𝄪" },
