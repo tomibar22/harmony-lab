@@ -308,6 +308,28 @@ export function figureOf(chordSize: 3 | 4, inversion: number): string {
   return ["7", "6/5", "4/3", "4/2"][inversion];
 }
 
+/** Case-sensitive roman numeral for a scale degree, derived from the actual
+ *  diatonic triad quality: uppercase = major, lowercase = minor,
+ *  lowercase+° = diminished, uppercase+⁺ = augmented (e.g. III⁺ in harmonic
+ *  minor). Single source of truth for numeral display across the workbook. */
+export function numeralOf(
+  key: Key,
+  degree: number,
+  form: MinorForm = "natural",
+  opts?: { seventh?: boolean }
+): string {
+  const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
+  const [root, third, fifth] = diatonicTriad(key, degree, 3, form);
+  const thirdSemis = midiOf(third) - midiOf(root);
+  const fifthSemis = midiOf(fifth) - midiOf(root);
+  const base = ROMAN[degree - 1];
+  let numeral: string;
+  if (fifthSemis === 6) numeral = base.toLowerCase() + "°";
+  else if (fifthSemis === 8) numeral = base + "⁺";
+  else numeral = thirdSemis === 4 ? base : base.toLowerCase();
+  return opts?.seventh ? numeral + "7" : numeral;
+}
+
 /** Diatonic triad on a scale degree: [root, third, fifth] spelled in the key. */
 export function diatonicTriad(
   key: Key,

@@ -15,6 +15,7 @@ import {
   findKey,
   invertChord,
   nameHeOf,
+  numeralOf,
   seventhPitches,
   triadPitches,
 } from "../../workbook/pitch";
@@ -86,19 +87,18 @@ type KeyRn = {
   mode: "major" | "minor";
   form?: "natural" | "harmonic";
   degree: number;
-  numeral: string;
   inv: number;
   bassOct: number;
 };
 const KEY_RN: KeyRn[] = [
-  { clef: "bass", keyHe: "רה♭", mode: "major", degree: 2, numeral: "II", inv: 1, bassOct: 3 },
-  { clef: "treble", keyHe: "לה", mode: "major", degree: 5, numeral: "V", inv: 0, bassOct: 4 },
-  { clef: "bass", keyHe: "מי♭", mode: "major", degree: 7, numeral: "VII", inv: 1, bassOct: 3 },
-  { clef: "treble", keyHe: "מי", mode: "major", degree: 4, numeral: "IV", inv: 2, bassOct: 4 },
-  { clef: "treble", keyHe: "סי", mode: "minor", form: "natural", degree: 3, numeral: "III", inv: 0, bassOct: 4 },
-  { clef: "bass", keyHe: "פה", mode: "major", degree: 6, numeral: "VI", inv: 0, bassOct: 3 },
-  { clef: "bass", keyHe: "דו♯", mode: "minor", form: "harmonic", degree: 5, numeral: "V", inv: 0, bassOct: 3 },
-  { clef: "treble", keyHe: "סול", mode: "major", degree: 2, numeral: "II", inv: 1, bassOct: 4 },
+  { clef: "bass", keyHe: "רה♭", mode: "major", degree: 2, inv: 1, bassOct: 3 },
+  { clef: "treble", keyHe: "לה", mode: "major", degree: 5, inv: 0, bassOct: 4 },
+  { clef: "bass", keyHe: "מי♭", mode: "major", degree: 7, inv: 1, bassOct: 3 },
+  { clef: "treble", keyHe: "מי", mode: "major", degree: 4, inv: 2, bassOct: 4 },
+  { clef: "treble", keyHe: "סי", mode: "minor", form: "natural", degree: 3, inv: 0, bassOct: 4 },
+  { clef: "bass", keyHe: "פה", mode: "major", degree: 6, inv: 0, bassOct: 3 },
+  { clef: "bass", keyHe: "דו♯", mode: "minor", form: "harmonic", degree: 5, inv: 0, bassOct: 3 },
+  { clef: "treble", keyHe: "סול", mode: "major", degree: 2, inv: 1, bassOct: 4 },
 ];
 
 /* ה · seventh chords by quality, root given */
@@ -235,6 +235,7 @@ const EXERCISES: Ex[] = [
       const key = findKey(s.keyHe, s.mode);
       const tones = diatonicTriad(key, s.degree, 3, s.form ?? "natural");
       const fig = figureOf(3, s.inv);
+      const numeral = numeralOf(key, s.degree, s.form ?? "natural");
       return (
         <ChordBuildItem
           clef={s.clef}
@@ -246,12 +247,12 @@ const EXERCISES: Ex[] = [
               {s.mode === "minor" && s.form === "harmonic" ? " (הרמוני)" : ""}
               {s.mode === "minor" && s.form === "natural" ? " (טבעי)" : ""}: בנו את{" "}
               <b>
-                <span className="rn" dir="ltr">{s.numeral}</span>
+                <span className="rn" dir="ltr">{numeral}</span>
               </b>{" "}
               במצב <b><Fig n={fig} /></b>.
             </>
           }
-          solutionLabel={`${s.numeral} של ${key.nameHe}, מצב ${fig}`}
+          solutionLabel={`${numeral} של ${key.nameHe}, מצב ${fig}`}
           solved={solved}
           markSolved={mark}
         />
@@ -335,7 +336,7 @@ const EXERCISES: Ex[] = [
             ) : (
               <>
                 לפניכם ספטאקורד <b>מוקטן</b> במצב יסודי. לאיזה סולם <b>מינורי</b> (הרמוני) הוא שייך —
-                כלומר, היכן הוא ה־<span className="rn" dir="ltr">VII°7</span>?
+                כלומר, היכן הוא ה־<span className="rn" dir="ltr">vii°7</span>?
               </>
             )
           }
@@ -363,7 +364,7 @@ export function Workbook04() {
         lede={
           <>
             שבעה תרגילים באקורדים: בנייה מכל צליל נתון, זיהוי יסוד־איכות־מצב, ספרור היפוכים,
-            אקורדים מתוך סולם ודרגה — ומציאת הסולם שמאחורי V7 ו־VII°7. עד כה נפתרו {solved} מתוך{" "}
+            אקורדים מתוך סולם ודרגה — ומציאת הסולם שמאחורי V7 ו־vii°7. עד כה נפתרו {solved} מתוך{" "}
             {total} פריטים.
           </>
         }

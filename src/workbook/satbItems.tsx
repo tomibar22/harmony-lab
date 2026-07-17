@@ -160,12 +160,11 @@ export function SatbIdItem({
  * 2. Roman numeral + figure from a key signature.
  * ========================================================================= */
 
-const NUMERALS = ["I", "II", "III", "IV", "V", "VI", "VII"] as const;
-
 export function SatbRnItem({
   chord,
   keySig,
   keyNameHe,
+  numeralOptions,
   numeralAnswer,
   figureAnswer,
   figureOptions,
@@ -175,6 +174,8 @@ export function SatbRnItem({
   chord: SatbChord;
   keySig: string;
   keyNameHe: string;
+  /** case-sensitive numerals of the key's seven degrees (see numeralOf) */
+  numeralOptions: string[];
   numeralAnswer: string;
   figureAnswer: string;
   figureOptions: string[];
@@ -207,7 +208,7 @@ export function SatbRnItem({
       </div>
       <Chips
         label="הדרגה:"
-        options={NUMERALS.map((n) => ({ value: n, label: <span dir="ltr">{n}</span> }))}
+        options={numeralOptions.map((n) => ({ value: n, label: <span dir="ltr">{n}</span> }))}
         value={numeral}
         onChange={(v) => {
           setNumeral(v);

@@ -22,6 +22,7 @@ import {
   findKey,
   midiOf,
   nameHeOf,
+  numeralOf,
   seventhPitches,
   triadPitches,
 } from "../../workbook/pitch";
@@ -94,7 +95,6 @@ const ID_ITEMS: IdSpec[] = [
 type RnSpec = {
   keyHe: string;
   degree: number;
-  numeral: string;
   inv: number;
   chord: SatbChord;
 };
@@ -102,26 +102,24 @@ type RnSpec = {
 const mkRn = (
   keyHe: string,
   degree: number,
-  numeral: string,
   inv: number,
   plan: Parameters<typeof voicing>[1]
 ): RnSpec => ({
   keyHe,
   degree,
-  numeral,
   inv,
   chord: voicing(diatonicTriad(findKey(keyHe, "major"), degree, 3), plan),
 });
 
 const RN_ITEMS: RnSpec[] = [
-  mkRn("סי♭", 2, "II", 1, { b: [1, 3], t: [2, 3], a: [0, 4], s: [0, 5] }),
-  mkRn("רה", 5, "V", 0, { b: [0, 2], t: [0, 3], a: [2, 4], s: [1, 5] }),
-  mkRn("מי♭", 4, "IV", 1, { b: [1, 3], t: [0, 3], a: [2, 4], s: [0, 4] }),
-  mkRn("לה", 1, "I", 2, { b: [2, 2], t: [2, 3], a: [0, 4], s: [1, 5] }),
-  mkRn("סול", 6, "VI", 0, { b: [0, 3], t: [1, 3], a: [2, 3], s: [0, 4] }),
-  mkRn("פה", 7, "VII", 1, { b: [1, 2], t: [0, 3], a: [1, 3], s: [2, 4] }),
-  mkRn("מי", 3, "III", 0, { b: [0, 3], t: [1, 3], a: [2, 4], s: [0, 4] }),
-  mkRn("לה♭", 5, "V", 2, { b: [2, 2], t: [0, 3], a: [2, 3], s: [1, 4] }),
+  mkRn("סי♭", 2, 1, { b: [1, 3], t: [2, 3], a: [0, 4], s: [0, 5] }),
+  mkRn("רה", 5, 0, { b: [0, 2], t: [0, 3], a: [2, 4], s: [1, 5] }),
+  mkRn("מי♭", 4, 1, { b: [1, 3], t: [0, 3], a: [2, 4], s: [0, 4] }),
+  mkRn("לה", 1, 2, { b: [2, 2], t: [2, 3], a: [0, 4], s: [1, 5] }),
+  mkRn("סול", 6, 0, { b: [0, 3], t: [1, 3], a: [2, 3], s: [0, 4] }),
+  mkRn("פה", 7, 1, { b: [1, 2], t: [0, 3], a: [1, 3], s: [2, 4] }),
+  mkRn("מי", 3, 0, { b: [0, 3], t: [1, 3], a: [2, 4], s: [0, 4] }),
+  mkRn("לה♭", 5, 2, { b: [2, 2], t: [0, 3], a: [2, 3], s: [1, 4] }),
 ];
 
 /* =========================================================================
@@ -133,21 +131,20 @@ type BuildSpec = {
   mode: "major" | "minor";
   form?: "natural" | "harmonic";
   degree: number;
-  numeral: string;
   inv: number;
   spacing: "close" | "open";
   solutionPlan: Parameters<typeof voicing>[1];
 };
 
 const BUILD_ITEMS: BuildSpec[] = [
-  { keyHe: "דו", mode: "major", degree: 1, numeral: "I", inv: 0, spacing: "close", solutionPlan: { b: [0, 3], t: [1, 4], a: [2, 4], s: [0, 5] } },
-  { keyHe: "סול", mode: "major", degree: 5, numeral: "V", inv: 0, spacing: "open", solutionPlan: { b: [0, 3], t: [2, 3], a: [1, 4], s: [0, 5] } },
-  { keyHe: "פה", mode: "major", degree: 4, numeral: "IV", inv: 0, spacing: "close", solutionPlan: { b: [0, 2], t: [1, 4], a: [2, 4], s: [0, 4] } },
-  { keyHe: "רה", mode: "major", degree: 2, numeral: "II", inv: 1, spacing: "open", solutionPlan: { b: [1, 2], t: [0, 3], a: [2, 4], s: [0, 5] } },
-  { keyHe: "מי♭", mode: "major", degree: 1, numeral: "I", inv: 1, spacing: "close", solutionPlan: { b: [1, 3], t: [0, 4], a: [2, 4], s: [0, 5] } },
-  { keyHe: "לה", mode: "major", degree: 1, numeral: "I", inv: 2, spacing: "close", solutionPlan: { b: [2, 3], t: [2, 4], a: [0, 4], s: [1, 5] } },
-  { keyHe: "לה", mode: "minor", form: "harmonic", degree: 5, numeral: "V", inv: 0, spacing: "close", solutionPlan: { b: [0, 3], t: [2, 3], a: [0, 4], s: [1, 4] } },
-  { keyHe: "סי♭", mode: "major", degree: 6, numeral: "VI", inv: 0, spacing: "open", solutionPlan: { b: [0, 2], t: [2, 3], a: [1, 3], s: [0, 4] } },
+  { keyHe: "דו", mode: "major", degree: 1, inv: 0, spacing: "close", solutionPlan: { b: [0, 3], t: [1, 4], a: [2, 4], s: [0, 5] } },
+  { keyHe: "סול", mode: "major", degree: 5, inv: 0, spacing: "open", solutionPlan: { b: [0, 3], t: [2, 3], a: [1, 4], s: [0, 5] } },
+  { keyHe: "פה", mode: "major", degree: 4, inv: 0, spacing: "close", solutionPlan: { b: [0, 2], t: [1, 4], a: [2, 4], s: [0, 4] } },
+  { keyHe: "רה", mode: "major", degree: 2, inv: 1, spacing: "open", solutionPlan: { b: [1, 2], t: [0, 3], a: [2, 4], s: [0, 5] } },
+  { keyHe: "מי♭", mode: "major", degree: 1, inv: 1, spacing: "close", solutionPlan: { b: [1, 3], t: [0, 4], a: [2, 4], s: [0, 5] } },
+  { keyHe: "לה", mode: "major", degree: 1, inv: 2, spacing: "close", solutionPlan: { b: [2, 3], t: [2, 4], a: [0, 4], s: [1, 5] } },
+  { keyHe: "לה", mode: "minor", form: "harmonic", degree: 5, inv: 0, spacing: "close", solutionPlan: { b: [0, 3], t: [2, 3], a: [0, 4], s: [1, 4] } },
+  { keyHe: "סי♭", mode: "major", degree: 6, inv: 0, spacing: "open", solutionPlan: { b: [0, 2], t: [2, 3], a: [1, 3], s: [0, 4] } },
 ];
 
 /* ========================================================================= */
@@ -197,7 +194,8 @@ const EXERCISES: Ex[] = [
           chord={s.chord}
           keySig={key.vex}
           keyNameHe={key.nameHe}
-          numeralAnswer={s.numeral}
+          numeralOptions={[1, 2, 3, 4, 5, 6, 7].map((d) => numeralOf(key, d))}
+          numeralAnswer={numeralOf(key, s.degree)}
           figureAnswer={figureOf(3, s.inv)}
           figureOptions={["5/3", "6", "6/4"]}
           solved={solved}
@@ -218,6 +216,7 @@ const EXERCISES: Ex[] = [
       const tones = diatonicTriad(key, s.degree, 3, s.form ?? "natural");
       const doublePc = s.inv === 2 ? pc(tones[2]) : pc(tones[0]);
       const fig = figureOf(3, s.inv);
+      const numeral = numeralOf(key, s.degree, s.form ?? "natural");
       return (
         <SatbBuildItem
           spec={{
@@ -227,7 +226,7 @@ const EXERCISES: Ex[] = [
               <>
                 בסולם <b>{key.nameHe}</b>
                 {s.form === "harmonic" ? " (הרמוני)" : ""}: בנו את{" "}
-                <b><span className="rn" dir="ltr">{s.numeral}</span></b>
+                <b><span className="rn" dir="ltr">{numeral}</span></b>
                 {s.inv > 0 && (
                   <>
                     {" "}במצב <b><Fig n={fig} /></b>
@@ -238,7 +237,7 @@ const EXERCISES: Ex[] = [
               </>
             ),
             solutionChord: voicing(tones, s.solutionPlan),
-            solutionLabel: `${s.numeral} של ${key.nameHe}`,
+            solutionLabel: `${numeral} של ${key.nameHe}`,
           }}
           solved={solved}
           markSolved={mark}

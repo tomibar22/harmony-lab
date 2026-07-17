@@ -15,6 +15,7 @@ import {
   keyOf,
   midiOf,
   nameOf,
+  numeralOf,
   pitchFromDia,
   spellScale,
   vexKeyOf,
@@ -163,6 +164,21 @@ describe("chords", () => {
   it("labels figures", () => {
     expect(figureOf(3, 2)).toBe("6/4");
     expect(figureOf(4, 1)).toBe("6/5");
+  });
+
+  it("cases roman numerals by triad quality", () => {
+    const c = findKey("דו", "major");
+    expect([1, 2, 3, 4, 5, 6, 7].map((d) => numeralOf(c, d))).toEqual([
+      "I", "ii", "iii", "IV", "V", "vi", "vii°",
+    ]);
+    const a = findKey("לה", "minor");
+    expect([1, 2, 3, 4, 5, 6, 7].map((d) => numeralOf(a, d))).toEqual([
+      "i", "ii°", "III", "iv", "v", "VI", "VII",
+    ]);
+    expect(numeralOf(a, 5, "harmonic")).toBe("V");
+    expect(numeralOf(a, 7, "harmonic")).toBe("vii°");
+    expect(numeralOf(a, 3, "harmonic")).toBe("III⁺");
+    expect(numeralOf(c, 5, "natural", { seventh: true })).toBe("V7");
   });
 
   it("builds diatonic triads in a key", () => {
