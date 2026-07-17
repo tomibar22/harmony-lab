@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useState } from "react";
 import { PARTS, UNITS } from "./units/registry";
+import { TOOLS } from "./tools/registry";
 import { FigText } from "./components/ui";
 
 function useHashRoute(): string {
@@ -87,6 +88,43 @@ function Home() {
         מסע אינטראקטיבי בהרמוניה טונאלית ובהובלת קולות, יחידה אחר יחידה, בעקבות המהלך הפדגוגי של
         אלדוול ושכטר - בעיבוד עברי מקורי שבו כל דוגמה נשמעת וכל מושג נבדק.
       </p>
+      <section className="home-part home-tools">
+        <h2 className="part-title">כלים · שולחן העבודה</h2>
+        <p className="part-desc">
+          מעבדות עצמאיות שמפעילות את חוקי הספר על חומר שאתם מביאים - לצד מסלול הלימוד.
+        </p>
+        <div className="units-grid">
+          {TOOLS.map((t) =>
+            t.ready ? (
+              <a key={t.id} className="unit-card ready tool-card" href={`#/tool/${t.id}`}>
+                <div className="u-num" aria-hidden>
+                  ⚒
+                </div>
+                <h3>
+                  <FigText text={t.title} />
+                </h3>
+                <p>
+                  <FigText text={t.blurb} />
+                </p>
+                <span className="badge">מוכן לעבודה</span>
+              </a>
+            ) : (
+              <div key={t.id} className="unit-card soon" aria-disabled>
+                <div className="u-num" aria-hidden>
+                  ⚒
+                </div>
+                <h3>
+                  <FigText text={t.title} />
+                </h3>
+                <p>
+                  <FigText text={t.blurb} />
+                </p>
+                <span className="badge">בקרוב</span>
+              </div>
+            )
+          )}
+        </div>
+      </section>
       {PARTS.map((part) => (
         <section key={part.num} className="home-part">
           <h2 className="part-title"><FigText text={part.title} /></h2>
@@ -132,6 +170,9 @@ export default function App() {
     : undefined;
   const wantsWorkbook = !!unitMatch?.[2];
   const UnitComp = wantsWorkbook ? unit?.workbook : unit?.component;
+  const toolMatch = route.match(/^#\/tool\/([\w-]+)/);
+  const tool = toolMatch ? TOOLS.find((t) => t.id === toolMatch[1] && t.ready) : undefined;
+  const ToolComp = tool?.component;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -153,7 +194,13 @@ export default function App() {
           {theme === "dark" ? "☀️" : "🌙"}
         </button>
       </header>
-      {UnitComp && wantsWorkbook ? (
+      {ToolComp ? (
+        <main className="workbook-wrap">
+          <Suspense fallback={<p style={{ padding: "3rem", color: "var(--ink-soft)" }}>טוען את הכלי…</p>}>
+            <ToolComp />
+          </Suspense>
+        </main>
+      ) : UnitComp && wantsWorkbook ? (
         <main className="workbook-wrap">
           <Suspense fallback={<p style={{ padding: "3rem", color: "var(--ink-soft)" }}>טוען את ספר העבודה…</p>}>
             <UnitComp />

@@ -17,6 +17,10 @@ type Props = {
   highlight?: number | null;      // playback highlight
   disabled?: boolean;
   ariaLabel?: string;
+  /** Spell freshly placed notes for a key: maps a diatonic position to the
+   *  key-signature alter (clicks/letters/nudges snap; explicit accidental
+   *  buttons still override). Omitted = everything placed natural. */
+  snapAlter?: (dia: number) => number;
 };
 
 function cssVar(name: string): string {
@@ -48,7 +52,7 @@ const LETTER_KEYS: Record<string, number> = { c: 0, d: 1, e: 2, f: 3, g: 4, a: 5
 /** An interactive staff: n slots, click a line/space (or type A–G) to place a
  *  note in the active slot, arrows to nudge, accidental buttons to inflect.
  *  Empty slots show a dashed placeholder. Everything plays as it's placed. */
-export function StaffInput({ clef, slots, value, onChange, given, status, highlight, disabled, ariaLabel }: Props) {
+export function StaffInput({ clef, slots, value, onChange, given, status, highlight, disabled, ariaLabel, snapAlter }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const noteEls = useRef<(SVGGElement | null)[]>([]);
   const isLocked = (i: number) => !!given?.[i];
@@ -74,7 +78,8 @@ export function StaffInput({ clef, slots, value, onChange, given, status, highli
 
   const place = (i: number, dia: number, alter = 0) => {
     const clamped = Math.max(minDia, Math.min(maxDia, dia));
-    set(i, pitchFromDia(clamped, alter));
+    const a = alter === 0 && snapAlter ? snapAlter(clamped) : alter;
+    set(i, pitchFromDia(clamped, a));
   };
 
   /* ---------- engraving ---------- */
